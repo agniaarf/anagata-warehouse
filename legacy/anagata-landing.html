@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anagata Warehouse — Fulfillment Service Jakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --purple: #610890;
+    --purple-deep: #2a0440;
+    --purple-glow: #a855f7;
+    --bg: #0a0710;
+    --bg-2: #120a1c;
+    --ink: #f4f1f7;
+    --muted: #ad9fc2;
+    --line: rgba(244,241,247,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Instrument Serif', serif;
+    font-weight:400;
+    line-height:1.05;
+  }
+  em{font-style:italic;color:var(--purple-glow);}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  section{position:relative;padding:110px 0;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+
+  /* texture accent */
+  .grid-accent{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    mask-image:linear-gradient(180deg, transparent, black 25%, black 75%, transparent);
+    pointer-events:none;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 28px;
+    background:linear-gradient(180deg, rgba(10,7,16,0.85), transparent);
+    backdrop-filter:blur(6px);
+  }
+  .logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:0.5px;}
+  .logo b{font-weight:400;color:var(--purple-glow);}
+  .logo img{height:28px;display:block;}
+  nav .cta-btn{font-size:13px;padding:10px 18px;}
+
+  .btn{
+    display:inline-block;
+    padding:13px 26px;
+    border-radius:2px;
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:0.2px;
+    transition:transform .25s ease, background .25s ease, border-color .25s ease;
+  }
+  .btn-solid{background:var(--purple);color:#fff;}
+  .btn-solid:hover{background:var(--purple-glow);transform:translateY(-2px);}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--purple-glow);transform:translateY(-2px);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;align-items:flex-end;
+    padding-top:140px;
+    position:relative;
+  }
+  .hero-carousel{position:absolute;inset:0;z-index:-2;overflow:hidden;}
+  .hero-slide{
+    position:absolute;inset:0;
+    background-size:cover;background-position:center;
+    filter:sepia(0.35) hue-rotate(230deg) saturate(1.4) brightness(0.85) contrast(1.05);
+    opacity:0;transition:opacity 1.8s ease;
+  }
+  .hero-slide.active{opacity:1;}
+  .hero-dots{position:absolute;bottom:40px;right:28px;display:flex;gap:8px;z-index:2;}
+  .hero-dots .dot{width:24px;height:3px;border-radius:0;background:rgba(244,241,247,0.25);cursor:pointer;transition:background .3s;}
+  .hero-dots .dot.active{background:var(--purple-glow);}
+  .hero-overlay{
+    position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg, rgba(10,7,16,0.55) 0%, rgba(10,7,16,0.75) 55%, var(--bg) 100%);
+  }
+  .hero-inner{padding-bottom:70px;max-width:900px;}
+  .hero-tag{
+    font-size:14px;color:var(--muted);
+    margin-bottom:18px;
+    letter-spacing:0.3px;
+  }
+  .hero h1{
+    font-size:clamp(42px, 6.5vw, 84px);
+    margin-bottom:26px;
+  }
+  .hero p{
+    font-size:18px;color:var(--muted);
+    max-width:560px;margin-bottom:36px;
+  }
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:46px;}
+  .hero-hash{
+    font-family:'Manrope';font-weight:800;
+    font-size:15px;color:var(--purple-glow);
+    letter-spacing:0.5px;
+  }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee-section{
+    padding:48px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:var(--bg-2);
+  }
+  .marquee-label{
+    text-align:center;font-size:13px;color:var(--muted);margin-bottom:26px;
+  }
+  .marquee-track{
+    display:flex;gap:28px;align-items:center;
+    width:max-content;
+    animation:scroll 28s linear infinite;
+  }
+  .mq-logo{
+    background:#fff;border-radius:8px;padding:10px 22px;
+    display:flex;align-items:center;justify-content:center;
+    height:44px;flex-shrink:0;
+  }
+  .mq-logo img{height:20px;max-width:110px;width:auto;object-fit:contain;display:block;}
+  @keyframes scroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:70px;align-items:start;
+  }
+  .eyebrow{font-size:13px;color:var(--purple-glow);margin-bottom:16px;font-weight:600;}
+  .about-grid h2{font-size:clamp(30px,4vw,44px);margin-bottom:24px;}
+  .about-grid p{color:var(--muted);font-size:16px;margin-bottom:16px;max-width:52ch;}
+  .vm-card{
+    border:1px solid var(--line);padding:28px;margin-bottom:16px;
+    background:linear-gradient(160deg, rgba(97,8,144,0.12), transparent);
+  }
+  .vm-card h3{font-size:20px;color:var(--purple-glow);margin-bottom:10px;font-style:italic;}
+  .vm-card ul{list-style:none;color:var(--muted);font-size:15px;}
+  .vm-card li{padding:6px 0;padding-left:18px;position:relative;}
+  .vm-card li::before{content:"—";position:absolute;left:0;color:var(--purple-glow);}
+
+  /* ---------- SERVICES ---------- */
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-head h2{font-size:clamp(30px,4vw,44px);}
+  .section-head p{color:var(--muted);margin-top:14px;font-size:16px;}
+
+  .service-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .service-card{
+    background:var(--bg);padding:32px 26px;cursor:pointer;
+    transition:background .3s ease;
+    position:relative;
+  }
+  .service-card:hover, .service-card.active{background:var(--bg-2);}
+  .service-card::after{
+    content:"+";
+    position:absolute;top:30px;right:24px;
+    font-size:20px;color:var(--muted);
+    transition:transform .3s ease, color .3s ease;
+  }
+  .service-card.active::after{transform:rotate(45deg);color:var(--purple-glow);}
+  .service-num{font-size:13px;color:var(--muted);margin-bottom:22px;display:block;}
+  .service-card h3{font-size:24px;margin-bottom:10px;}
+  .service-hint{font-size:13px;color:var(--muted);}
+  .service-hint::after{content:" — klik untuk lihat alur";opacity:0.65;}
+  .service-detail{
+    max-height:0;overflow:hidden;
+    transition:max-height .4s ease;
+  }
+  .service-card.active .service-detail{max-height:400px;margin-top:20px;}
+  .service-detail p{font-size:14px;color:var(--muted);margin-bottom:16px;}
+  .flow-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .flow-step{
+    font-size:12px;padding:6px 12px;border:1px solid var(--line);color:var(--ink);
+    white-space:nowrap;
+  }
+  .flow-arrow{color:var(--purple-glow);font-size:13px;}
+
+  /* ---------- VALUE PROP ---------- */
+  .value-section{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .value-head{text-align:center;max-width:720px;margin:0 auto 64px;}
+  .value-head h2{font-size:clamp(32px,5vw,52px);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line);}
+  .stat-card{padding:36px 24px;border-left:1px solid var(--line);}
+  .stat-card:first-child{border-left:none;}
+  .stat-num{font-family:'Instrument Serif',serif;font-size:44px;color:var(--purple-glow);display:block;}
+  .stat-label{font-size:14px;color:var(--muted);margin-top:8px;}
+
+  /* ---------- LOCATION ---------- */
+  .loc-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start;}
+  .map-wrap{border:1px solid var(--line);height:460px;position:relative;overflow:hidden;}
+  #locMap{width:100%;height:100%;background:var(--bg);}
+  .leaflet-container{background:#e9e6ee !important;font-family:'Manrope';}
+  .leaflet-tooltip{background:var(--bg-2) !important;color:var(--ink) !important;border:1px solid var(--line) !important;border-radius:0 !important;font-size:12px;box-shadow:none !important;}
+  .leaflet-tooltip-top:before{border-top-color:var(--line) !important;}
+  .marker-hub{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;}
+  .marker-hub .ring{position:absolute;inset:0;border-radius:50%;background:rgba(97,8,144,0.14);}
+  .marker-hub .ring2{position:absolute;inset:8px;border-radius:50%;background:rgba(97,8,144,0.22);}
+  .marker-hub .badge{position:relative;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--purple-glow), var(--purple-deep) 75%);border:2px solid #fff;box-shadow:0 4px 14px rgba(42,4,64,0.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:'Manrope';}
+  .marker-dot{width:9px;height:9px;border-radius:50%;background:var(--purple);border:1.5px solid #fff;box-shadow:0 0 0 3px rgba(97,8,144,0.2);}
+  .marker-ghost{position:relative;width:12px;height:12px;border-radius:50%;background:rgba(97,8,144,0.4);margin:7px;}
+  .marker-ghost span{position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(97,8,144,0.45);animation:pulseGhost 2.6s ease-out infinite;}
+  @keyframes pulseGhost{0%{transform:scale(0.5);opacity:0.7;}100%{transform:scale(2.1);opacity:0;}}
+  .route-line{stroke-dasharray:5,6;animation:dashFlow 1.6s linear infinite;}
+  @keyframes dashFlow{to{stroke-dashoffset:-22;}}
+  .loc-panel h2{font-size:clamp(26px,3vw,34px);margin-bottom:14px;line-height:1.15;}
+  .loc-panel>p{color:var(--muted);font-size:15px;margin-bottom:24px;max-width:44ch;}
+  .loc-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .loc-card{
+    display:flex;align-items:center;gap:14px;padding:14px 16px;
+    border:1px solid var(--line);cursor:pointer;
+    transition:background .25s ease, border-color .25s ease;
+  }
+  .loc-card:hover{border-color:var(--purple-glow);}
+  .loc-card.active{background:var(--purple);border-color:var(--purple);}
+  .loc-card-badge{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    background:var(--bg-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--ink);
+  }
+  .loc-card.active .loc-card-badge{background:#fff;color:var(--purple);border-color:#fff;}
+  .loc-card-info{flex:1;min-width:0;}
+  .loc-card-info h4{font-size:15px;font-weight:700;margin-bottom:3px;}
+  .loc-card-info p{font-size:12.5px;color:var(--muted);line-height:1.4;}
+  .loc-card.active .loc-card-info p{color:rgba(244,241,247,0.75);}
+  .loc-card-thumb{
+    width:52px;height:52px;flex-shrink:0;border-radius:4px;overflow:hidden;
+    background-size:cover;background-position:center;
+  }
+  .loc-toggle{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap;}
+  .loc-toggle-btn{
+    font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:999px;
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    cursor:pointer;transition:all .2s ease;font-family:'Manrope';
+  }
+  .loc-toggle-btn.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+  .loc-toggle-btn:not(.active):hover{border-color:var(--purple-glow);color:var(--ink);}
+  .loc-stats{display:flex;gap:0;border-top:1px solid var(--line);margin-bottom:26px;}
+  .loc-stat{flex:1;padding:18px 4px 0;border-left:1px solid var(--line);}
+  .loc-stat:first-child{border-left:none;padding-left:0;}
+  .loc-stat b{display:block;font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;color:var(--purple-glow);}
+  .loc-stat span{font-size:12px;color:var(--muted);}
+
+  /* ---------- GALLERY ---------- */
+  .gallery-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px;}
+  .gal-nav{display:flex;gap:10px;}
+  .gal-btn{width:42px;height:42px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;}
+  .gal-btn:hover{border-color:var(--purple-glow);}
+  .gal-track{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .gal-item{aspect-ratio:4/5;overflow:hidden;position:relative;border:1px solid var(--line);}
+  .gal-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;}
+  .gal-item:hover img{transform:scale(1.06);}
+  .gal-cap{position:absolute;bottom:0;left:0;right:0;padding:14px 16px;font-size:13px;background:linear-gradient(0deg, rgba(10,7,16,0.9), transparent);}
+  .gal-dots{display:flex;gap:8px;justify-content:center;margin-top:32px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--line);cursor:pointer;}
+  .dot.active{background:var(--purple-glow);}
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  footer{background:var(--bg-2);border-top:1px solid var(--line);padding:90px 0 40px;}
+  .foot-head{max-width:600px;margin-bottom:70px;}
+  .foot-head h2{font-size:clamp(32px,5vw,54px);}
+  .foot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;padding-bottom:50px;border-bottom:1px solid var(--line);}
+  .foot-col h4{font-size:13px;color:var(--muted);margin-bottom:14px;font-weight:600;}
+  .foot-col div{font-size:15px;margin-bottom:6px;}
+  .foot-bottom{display:flex;justify-content:space-between;padding-top:30px;font-size:13px;color:var(--muted);flex-wrap:wrap;gap:10px;}
+
+  /* ---------- FLOATING CONTACT ---------- */
+  .float-contact{position:fixed;right:24px;bottom:24px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+  .float-toggle{width:52px;height:52px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 10px 28px rgba(97,8,144,0.55);transition:transform .3s ease, background .3s ease;}
+  .float-toggle:hover{background:var(--purple-glow);}
+  .float-contact.open .float-toggle{transform:rotate(45deg);}
+  .float-panel{display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transform:translateY(10px);transition:all .3s ease;}
+  .float-contact.open .float-panel{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .float-link{background:var(--bg-2);border:1px solid var(--line);padding:10px 18px;font-size:13px;text-align:right;white-space:nowrap;}
+  .float-link:hover{border-color:var(--purple-glow);color:var(--purple-glow);}
+
+  @media(max-width:900px){
+    .about-grid,.loc-grid{grid-template-columns:1fr;gap:40px;}
+    .service-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-card:nth-child(3){border-left:none;}
+    .gal-track{grid-template-columns:repeat(2,1fr);}
+    .foot-grid{grid-template-columns:repeat(2,1fr);}
+    .map-wrap{height:360px;}
+  }
+  @media(max-width:560px){
+    section{padding:70px 0;}
+    .service-grid,.gal-track{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:1fr;}
+    .stat-card{border-left:none;border-top:1px solid var(--line);}
+    .stat-card:first-child{border-top:none;}
+    .foot-grid{grid-template-columns:1fr;}
+    .map-wrap{height:300px;}
+    .loc-card{flex-wrap:wrap;}
+    .loc-card-thumb{display:none;}
+    .loc-stats{flex-wrap:wrap;}
+    .loc-stat{flex:1 1 33%;border-left:none;border-top:1px solid var(--line);padding:14px 4px 0;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><img src="logo-light.png" alt="Anagata Warehouse"></div>
+  <a href="#contact" class="btn btn-solid cta-btn">Hubungi Kami</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-carousel" id="heroCarousel">
+    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1644079446600-219068676743?w=1600&h=1000&q=80&auto=format&fit=crop')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1700165644892-3dd6b67b25bc?w=1600&h=1000&q=80&auto=format&fit=crop')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1613690399151-65ea69478674?w=1600&h=1000&q=80&auto=format&fit=crop')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1714627798569-b3e36d409c4b?w=1600&h=1000&q=80&auto=format&fit=crop')"></div>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-tag">Fulfillment Partner untuk Seller Indonesia</div>
+    <h1>Kelola gudang dan operasional<br>fulfillment-mu, <em>bersama kami.</em></h1>
+    <p>Dari penerimaan produk, pengaturan inventory, pemrosesan order, packing, hingga handover ke ekspedisi dan pengelolaan return — Anagata menjaga setiap tahap operasional gudangmu berjalan rapi, aman, dan tepat waktu, setiap hari.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-solid">Mulai Kerja Sama</a>
+      <a href="#services" class="btn btn-ghost">Lihat Layanan</a>
+    </div>
+    <div class="hero-hash">#LetsWorkTogether</div>
+  </div>
+  <div class="hero-dots" id="heroDots"></div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-label">Terhubung dengan mitra ekspedisi terpercaya</div>
+  <div class="marquee-track" id="marquee">
+    <span class="mq-logo"><img src="partner-logos/jne.png" alt="JNE Express"></span>
+    <span class="mq-logo"><img src="partner-logos/spx-express.png" alt="SPX Express"></span>
+    <span class="mq-logo"><img src="partner-logos/sap-express.svg" alt="SAP Express"></span>
+    <span class="mq-logo"><img src="partner-logos/anteraja.png" alt="AnterAja"></span>
+    <span class="mq-logo"><img src="partner-logos/jt-express.svg" alt="J&amp;T Express"></span>
+    <span class="mq-logo"><img src="partner-logos/sicepat.svg" alt="SiCepat"></span>
+    <span class="mq-logo"><img src="partner-logos/lion-parcel.svg" alt="Lion Parcel"></span>
+    <span class="mq-logo"><img src="partner-logos/id-express.png" alt="ID Express"></span>
+    <span class="mq-logo"><img src="partner-logos/pos-indonesia.svg" alt="Pos Indonesia"></span>
+    <span class="mq-logo"><img src="partner-logos/ninja-xpress.png" alt="Ninja Xpress"></span>
+  </div>
+</div>
+
+<!-- ABOUT / VISI MISI -->
+<section id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="eyebrow">Tentang Anagata</div>
+      <h2>Lahir dari komitmen menjadi <em>sahabat seller</em>.</h2>
+      <p>Anagata Warehouse berdiri di bawah bendera CV Anagata Satria Nusantara sejak 2024, bergerak di lini fulfillment dan home packing. Nama "Anagata" berarti harapan yang baik — untuk seller, kurir, buyer, dan setiap orang yang terlibat di dalamnya.</p>
+      <p>Kami hadir untuk mempermudah seller mengelola inventory, data, packing, hingga urusan shipping — supaya seller bisa fokus mengembangkan bisnisnya, bukan sibuk mengurus gudang.</p>
+    </div>
+    <div>
+      <div class="vm-card">
+        <h3>Visi</h3>
+        <p style="color:var(--ink);font-size:15px;margin:0;">Menjadi mitra fulfillment terpercaya yang menghubungkan seller Indonesia dengan operasional gudang yang rapi, cepat, dan transparan di seluruh penjuru negeri.</p>
+      </div>
+      <div class="vm-card">
+        <h3>Misi</h3>
+        <ul>
+          <li>Memberikan layanan fulfillment end-to-end yang akurat dan tepat waktu</li>
+          <li>Menjaga keamanan data dan produk milik setiap seller</li>
+          <li>Memperluas jangkauan gudang ke seluruh wilayah Indonesia</li>
+          <li>Membangun proses kerja yang transparan lewat data yang selalu update</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Layanan Kami</div>
+      <h2>Empat pilar operasional gudang.</h2>
+      <p>Klik tiap layanan untuk melihat alur kerjanya.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="service-grid" id="serviceGrid">
+
+      <div class="service-card" data-i="0">
+        <span class="service-num">Gudang</span>
+        <h3>Inbound</h3>
+        <div class="service-hint">Penerimaan &amp; pencatatan produk masuk</div>
+        <div class="service-detail">
+          <p>Monitoring request, penerimaan produk dari seller/supplier, pengecekan kondisi, hingga update data ke sistem.</p>
+          <div class="flow-row">
+            <span class="flow-step">Inbound</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Unboxing</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Report</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Racking</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" data-i="1">
+        <span class="service-num">Gudang</span>
+        <h3>Inventory</h3>
+        <div class="service-hint">Penataan &amp; kontrol stok harian</div>
+        <div class="service-detail">
+          <p>Pengaturan lokasi penyimpanan berdasarkan seller dan SKU, disimpan sesuai kapasitas, dan dikontrol setiap hari untuk keamanan stok.</p>
+          <div class="flow-row">
+            <span class="flow-step">Location Mapping</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Slotting</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Storage</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Daily Control</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" data-i="2">
+        <span class="service-num">Gudang</span>
+        <h3>Outbound</h3>
+        <div class="service-hint">Proses order sampai ke ekspedisi</div>
+        <div class="service-detail">
+          <p>Verifikasi order, pengambilan produk, pengemasan sesuai SOP, penyortiran, hingga serah terima ke pihak ekspedisi.</p>
+          <div class="flow-row">
+            <span class="flow-step">Scanning</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Filtering</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Picking</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Packing</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Handover 3PL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" data-i="3">
+        <span class="service-num">Gudang</span>
+        <h3>Return</h3>
+        <div class="service-hint">Pengelolaan produk kembali</div>
+        <div class="service-detail">
+          <p>Penerimaan paket return dari ekspedisi, pengecekan kondisi &amp; isi paket, lalu dikembalikan ke inventory atau diproses sebagai klaim.</p>
+          <div class="flow-row">
+            <span class="flow-step">Return</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Unboxing</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Report</span><span class="flow-arrow">→</span>
+            <span class="flow-step">Good/Not Good</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VALUE PROP -->
+<section class="value-section">
+  <div class="wrap">
+    <div class="value-head">
+      <div class="eyebrow" style="text-align:center;">Kenapa Anagata</div>
+      <h2><em>#SahabatSeller</em> harus pilih Anagata.</h2>
+      <p style="text-align:center;color:var(--muted);margin-top:14px;font-size:15px;">Empat komitmen yang kami pegang di setiap resi yang masuk ke gudang kami.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-num">1 Hari</span>
+        <div class="stat-label">Resi yang masuk hari ini, dipacking &amp; diserahkan ke ekspedisi hari itu juga.</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">Real-time</span>
+        <div class="stat-label">Data stock, inbound, outbound, dan return selalu update dan bisa diakses kapan pun.</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">100%</span>
+        <div class="stat-label">Kerahasiaan data penjualan &amp; produk seller jadi prioritas utama kami.</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">Terpisah</span>
+        <div class="stat-label">Produk tiap seller tertata dan terpisah rapi dari seller lainnya.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location">
+  <div class="wrap">
+    <div class="loc-grid">
+      <div class="map-wrap"><div id="locMap"></div></div>
+      <div class="loc-panel">
+        <div class="eyebrow">Lokasi Gudang</div>
+        <h2>Gudang di dua pulau, <em>kiriman lebih dekat.</em></h2>
+        <p>Titip stok di gudang yang paling deket sama basis pelangganmu, atau pakai dua-duanya buat pangkas waktu kirim ke timur dan barat sekaligus.</p>
+        <div class="loc-cards" id="locCards">
+          <div class="loc-card active" data-lat="-6.225" data-lng="106.900">
+            <div class="loc-card-badge">JKT</div>
+            <div class="loc-card-info">
+              <h4>Warehouse Jakarta</h4>
+              <p>Jl. Bojong Indah Raya No.4, Duren Sawit, Jakarta Timur 13450</p>
+            </div>
+            <div class="loc-card-thumb" style="background-image:url('https://images.unsplash.com/photo-1601598505513-7489a6272d2a?w=200&h=200&q=70&auto=format&fit=crop')"></div>
+          </div>
+          <div class="loc-card" data-lat="-5.147" data-lng="119.432">
+            <div class="loc-card-badge">MKS</div>
+            <div class="loc-card-info">
+              <h4>Warehouse Makassar</h4>
+              <p>Jl. Cilallang Jaya VII No.17, Rappocini, Makassar 90222</p>
+            </div>
+            <div class="loc-card-thumb" style="background-image:url('https://images.unsplash.com/photo-1605745341112-85968b19335b?w=200&h=200&q=70&auto=format&fit=crop')"></div>
+          </div>
+        </div>
+        <div class="loc-toggle">
+          <button type="button" class="loc-toggle-btn active" id="btnHideReach">Sembunyikan Jangkauan</button>
+          <button type="button" class="loc-toggle-btn" id="btnShowAll">Lihat Semua</button>
+        </div>
+        <div class="loc-stats">
+          <div class="loc-stat"><b>2</b><span>gudang aktif</span></div>
+          <div class="loc-stat"><b>12</b><span>kota tujuan utama</span></div>
+          <div class="loc-stat"><b>2</b><span>pulau basis operasi</span></div>
+        </div>
+        <a href="#contact" class="btn btn-solid" style="display:block;text-align:center;">Tanya Gudang Mana yang Cocok</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" style="border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div class="gallery-head">
+      <div>
+        <div class="eyebrow">Galeri</div>
+        <h2 style="font-size:clamp(28px,4vw,40px);">Aktivitas di dalam gudang.</h2>
+        <p style="color:var(--muted);font-size:14px;margin-top:8px;max-width:40ch;">Sekilas proses harian tim kami, dari rak penyimpanan sampai paket siap dikirim ke ekspedisi.</p>
+      </div>
+      <div class="gal-nav">
+        <div class="gal-btn" id="galPrev">←</div>
+        <div class="gal-btn" id="galNext">→</div>
+      </div>
+    </div>
+    <div class="gal-track" id="galTrack"></div>
+    <div class="gal-dots" id="galDots"></div>
+  </div>
+</section>
+
+<!-- CONTACT / FOOTER -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-head">
+      <div class="eyebrow">Hubungi Kami</div>
+      <h2>Siap kerja sama? <em>Let's talk.</em></h2>
+    </div>
+    <div class="foot-grid">
+      <div class="foot-col">
+        <h4>Telepon</h4>
+        <div>+62 822-1075-0844</div>
+      </div>
+      <div class="foot-col">
+        <h4>Email</h4>
+        <div>anagatafulfill@gmail.com</div>
+      </div>
+      <div class="foot-col">
+        <h4>Alamat</h4>
+        <div>Duren Sawit, Jakarta Timur</div>
+      </div>
+      <div class="foot-col">
+        <h4>Instagram</h4>
+        <div>@anagatawarehouse</div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Anagata Warehouse</div>
+      <div>#LetsWorkTogether</div>
+    </div>
+  </div>
+</footer>
+
+<div class="grid-accent" style="position:fixed;top:0;height:100vh;z-index:-10;"></div>
+
+<div class="float-contact" id="floatContact">
+  <div class="float-panel">
+    <a href="https://wa.me/6282210750844" target="_blank" rel="noopener" class="float-link">WhatsApp</a>
+    <a href="https://instagram.com/anagatawarehouse" target="_blank" rel="noopener" class="float-link">Instagram</a>
+    <a href="mailto:anagatafulfill@gmail.com" class="float-link">Email</a>
+  </div>
+  <div class="float-toggle" id="floatToggle">+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  // marquee duplicate for seamless loop
+  const mq = document.getElementById('marquee');
+  mq.innerHTML += mq.innerHTML;
+
+  // service cards toggle
+  document.querySelectorAll('.service-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const isActive = card.classList.contains('active');
+      document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('active'));
+      if(!isActive) card.classList.add('active');
+    });
+  });
+
+  // gallery pagination (3 per page)
+  const galItems = [
+    {id:'1601598704991-eef6114775e0', cap:'Area penyimpanan inventory'},
+    {id:'1740914994657-f1cdffdc418e', cap:'Proses picking barang sesuai order'},
+    {id:'1700727448575-6f1680cd7d75', cap:'Quality control sebelum packing'},
+    {id:'1766040923580-16ad32fae8b4', cap:'Proses packing sesuai SOP'},
+    {id:'1608822101624-23542c56db89', cap:'Sortir paket per ekspedisi'},
+    {id:'1717457779749-7a6707d042ad', cap:'Handover ke mitra ekspedisi'},
+    {id:'1736507748808-31bb64ce6fcc', cap:'Rak penyimpanan produk seller'},
+    {id:'1664382953403-fc1ac77073a0', cap:'Tim operasional gudang'},
+    {id:'1573376670774-4427757f7963', cap:'Proses unboxing barang inbound'},
+  ];
+  const perPage = 3;
+  let page = 0;
+  const totalPages = Math.ceil(galItems.length/perPage);
+  const track = document.getElementById('galTrack');
+  const dots = document.getElementById('galDots');
+
+  function renderGallery(){
+    track.innerHTML = '';
+    const start = page*perPage;
+    galItems.slice(start,start+perPage).forEach((it,i)=>{
+      const div = document.createElement('div');
+      div.className='gal-item';
+      div.innerHTML = `<img src="https://images.unsplash.com/photo-${it.id}?w=600&h=780&q=80&auto=format&fit=crop" alt=""><div class="gal-cap">${it.cap}</div>`;
+      track.appendChild(div);
+    });
+    dots.innerHTML='';
+    for(let i=0;i<totalPages;i++){
+      const d = document.createElement('div');
+      d.className='dot'+(i===page?' active':'');
+      d.addEventListener('click',()=>{page=i;renderGallery();});
+      dots.appendChild(d);
+    }
+  }
+  document.getElementById('galPrev').addEventListener('click',()=>{
+    page = (page-1+totalPages)%totalPages; renderGallery();
+  });
+  document.getElementById('galNext').addEventListener('click',()=>{
+    page = (page+1)%totalPages; renderGallery();
+  });
+  renderGallery();
+
+  // hero carousel
+  (function(){
+    const slides = document.querySelectorAll('.hero-slide');
+    const dotsWrap = document.getElementById('heroDots');
+    slides.forEach((s,i)=>{
+      const d=document.createElement('div');
+      d.className='dot'+(i===0?' active':'');
+      d.addEventListener('click',()=>go(i));
+      dotsWrap.appendChild(d);
+    });
+    let idx=0;
+    function go(i){
+      slides[idx].classList.remove('active');
+      dotsWrap.children[idx].classList.remove('active');
+      idx=i;
+      slides[idx].classList.add('active');
+      dotsWrap.children[idx].classList.add('active');
+    }
+    setInterval(()=>{ go((idx+1)%slides.length); }, 5000);
+  })();
+
+  // floating contact
+  document.getElementById('floatToggle').addEventListener('click', ()=>{
+    document.getElementById('floatContact').classList.toggle('open');
+  });
+
+  // leaflet location map — Esri light-gray tiles, free & keyless
+  (function(){
+    const map = L.map('locMap', {zoomControl:false, attributionControl:false, scrollWheelZoom:false, dragging:!L.Browser.mobile})
+      .setView([-2.5, 112], 4.7);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom:16}).addTo(map);
+
+    const JAKARTA = [-6.225,106.900];
+    const MAKASSAR = [-5.147,119.432];
+    const YOGYAKARTA = [-7.797,110.370];
+    const MEDAN = [3.595,98.672];
+    const BANJARMASIN = [-3.319,114.590];
+    const ALL_POINTS = [JAKARTA,MAKASSAR,YOGYAKARTA,MEDAN,BANJARMASIN];
+
+    function hubIcon(code){
+      return L.divIcon({className:'', html:`<div class="marker-hub"><div class="ring"></div><div class="ring2"></div><div class="badge">${code}</div></div>`, iconSize:[52,52]});
+    }
+    function dotIcon(){ return L.divIcon({className:'', html:'<div class="marker-dot"></div>', iconSize:[9,9]}); }
+    function ghostIcon(){ return L.divIcon({className:'', html:'<div class="marker-ghost"><span></span></div>', iconSize:[26,26]}); }
+
+    // dashed reach lines from each active hub to its nearest cities-in-progress
+    const routeStyle = {className:'route-line', color:'#610890', weight:1.6, opacity:0.55};
+    const reachLayers = [[JAKARTA,YOGYAKARTA],[JAKARTA,MEDAN],[MAKASSAR,BANJARMASIN],[JAKARTA,MAKASSAR]]
+      .map(pair => L.polyline(pair, routeStyle));
+
+    // small reach dots + pulsing ghost markers at each destination-in-progress
+    reachLayers.push(
+      ...[YOGYAKARTA,MEDAN,BANJARMASIN].map(pt => L.marker(pt, {icon:dotIcon(), zIndexOffset:-10})),
+      L.marker(YOGYAKARTA, {icon:ghostIcon()}).bindTooltip('Yogyakarta · Segera Hadir', {direction:'top', offset:[0,-10]}),
+      L.marker(MEDAN, {icon:ghostIcon()}).bindTooltip('Medan · Segera Hadir', {direction:'top', offset:[0,-10]}),
+      L.marker(BANJARMASIN, {icon:ghostIcon()}).bindTooltip('Banjarmasin · Segera Hadir', {direction:'top', offset:[0,-10]})
+    );
+
+    L.marker(JAKARTA, {icon:hubIcon('JKT')}).addTo(map).bindTooltip('Jakarta · Aktif', {direction:'top', offset:[0,-20]});
+    L.marker(MAKASSAR, {icon:hubIcon('MKS')}).addTo(map).bindTooltip('Makassar · Aktif', {direction:'top', offset:[0,-20]});
+
+    // "Sembunyikan Jangkauan" / "Lihat Semua" toggle
+    const btnHide = document.getElementById('btnHideReach');
+    const btnShow = document.getElementById('btnShowAll');
+    btnHide.addEventListener('click', ()=>{
+      reachLayers.forEach(l=>map.removeLayer(l));
+      btnHide.classList.add('active'); btnShow.classList.remove('active');
+    });
+    btnShow.addEventListener('click', ()=>{
+      reachLayers.forEach(l=>l.addTo(map));
+      map.fitBounds(ALL_POINTS, {padding:[30,30]});
+      btnShow.classList.add('active'); btnHide.classList.remove('active');
+    });
+
+    // clicking a warehouse card highlights it and flies the map there
+    document.querySelectorAll('.loc-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        document.querySelectorAll('.loc-card').forEach(c=>c.classList.remove('active'));
+        card.classList.add('active');
+        map.flyTo([parseFloat(card.dataset.lat), parseFloat(card.dataset.lng)], 6, {duration:0.8});
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

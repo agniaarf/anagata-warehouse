@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anagatawarehouse.infinityfreeapp.com/sitemap.xml

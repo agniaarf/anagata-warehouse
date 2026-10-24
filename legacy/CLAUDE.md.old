@@ -1,0 +1,75 @@
+# Anagata Warehouse — Landing Page
+
+Dokumentasi teknis untuk `anagata-landing.html`. File ini single-file HTML (CSS + JS inline), tidak butuh build step — tinggal buka langsung di browser atau upload ke hosting statis mana pun.
+
+## Stack
+- Vanilla HTML/CSS/JS, tanpa framework
+- Font: **Instrument Serif** (display/heading, termasuk italic emphasis) + **Manrope** (body) via Google Fonts
+- **Leaflet.js 1.9.4** (via cdnjs) untuk peta interaktif di section Lokasi, tile **light/gray** dari **Esri `World_Light_Gray_Base`** (`server.arcgisonline.com/.../MapServer/tile/{z}/{y}/{x}`) — gratis, tanpa API key. (Sempat dicoba versi `dark_all` tapi kurang kebaca karena section-nya dark theme juga, jadi diganti terang biar kontras dengan marker ungu. Sempat juga pakai tile CartoDB `light_all` dari `basemaps.cartocdn.com`, tapi endpoint itu sekarang menampilkan watermark "API key required" di free tier terbaru mereka, jadi diganti ke Esri yang masih benar-benar keyless.)
+- Marker peta lokasi: hub aktif (Jakarta/Makassar) pakai badge lingkaran berkode kota (`JKT`/`MKS`) dengan glow ring ganda, dihubungkan garis putus-putus (dashed, animasi berjalan) ke kota "segera hadir" terdekat — meniru gaya network map, bukan pin generik. Garis + titik "jangkauan" ini disembunyikan secara default dan baru muncul saat tombol **Lihat Semua** di panel lokasi diklik (lihat toggle di bawah).
+- Logo: `logo-light.png` (versi putih, transparan) dipakai sebagai `<img>` di nav (`.logo img`) — sebelumnya teks "ANAGATA Warehouse".
+- Gambar hero & galeri: link langsung `images.unsplash.com/photo-<id>` (bukan `source.unsplash.com` yang sudah almarhum sejak 2023 dan cuma nampilin broken image) — tetap difilter duotone ungu lewat CSS (`grayscale + sepia + hue-rotate`) supaya konsisten meskipun foto aslinya warna-warni. ID foto di-hardcode per slide/`galItems`, bukan hasil query kata kunci dinamis lagi.
+- Logo mitra ekspedisi: 10 file asli (PNG/SVG/WebP) di folder `partner-logos/` (JNE, SPX Express, SAP Express/SAPX, AnterAja, J&T Express, SiCepat, Lion Parcel, ID Express, Pos Indonesia, Ninja Xpress), diunduh dari sumber resmi masing-masing (situs resmi / Wikimedia Commons / CDN resmi brand) dan ditampilkan di atas chip putih (`.mq-logo`) di marquee supaya logo full-color tetap kebaca di atas background gelap.
+
+## Design tokens (di `:root`)
+| Token | Nilai | Peran |
+|---|---|---|
+| `--purple` | `#610890` | Primary brand color |
+| `--purple-deep` | `#2a0440` | Gradient/shadow gelap |
+| `--purple-glow` | `#a855f7` | Aksen terang, hover, italic emphasis, marker aktif |
+| `--bg` | `#0a0710` | Background utama |
+| `--bg-2` | `#120a1c` | Background section alternatif (marquee, value prop, footer) |
+| `--ink` | `#f4f1f7` | Warna teks utama |
+| `--muted` | `#ad9fc2` | Teks sekunder/deskripsi |
+
+## Struktur section (urutan di halaman)
+1. **Nav** — fixed, logo + CTA
+2. **Hero** — carousel 4 foto cross-fade (autoplay 5 detik + dot navigasi), headline dengan italic emphasis, tagline `#LetsWorkTogether`
+3. **Marquee** — nama mitra ekspedisi berjalan infinite scroll
+4. **About** — Visi & Misi (card kiri-kanan)
+5. **Services** (`#services`) — 4 card (Inbound/Inventory/Outbound/Return), klik untuk expand mini-flow + deskripsi. Indikator `+` di pojok kanan atas card berputar 45° saat aktif
+6. **Value Proposition** — 4 stat besar ala editorial (bukan generic icon card)
+7. **Location** (`#location`) — peta Leaflet + panel di kanan berisi: heading, 2 card gudang aktif (`.loc-card`, klik untuk fly-to + highlight card), toggle pill **Sembunyikan Jangkauan** / **Lihat Semua** (kontrol tampil-tidaknya garis+titik jangkauan di peta), 3 angka statistik (`.loc-stats`), dan CTA "Tanya Gudang Mana yang Cocok". Marker aktif (Jakarta, Makassar) solid dengan glow; marker "coming soon" (Yogyakarta, Medan, Banjarmasin) berupa titik pudar dengan animasi pulse pelan ("senyap"), disembunyikan by default
+8. **Gallery** (`#gallery`) — card pagination 3 foto/halaman dengan tombol prev/next + dot indicator
+9. **Contact/Footer** (`#contact`) — info kontak + copyright
+10. **Floating contact widget** — tombol bulat kanan-bawah, klik untuk expand link WhatsApp/Instagram/Email
+
+## Cara kustomisasi cepat
+
+**Ganti foto asli (hapus filter duotone):**
+Cari `filter:grayscale(1) sepia(1)...` di CSS class `.hero-slide`, `.gal-item img` — hapus baris filter tersebut setelah foto asli gudang tersedia, atau ganti `src`/`background-image` ke URL foto asli.
+
+**Ganti/tambah lokasi gudang di peta:**
+Edit array marker di bagian bawah `<script>` (fungsi IIFE peta leaflet):
+```js
+L.marker([lat, lng], {icon:activeIcon()}).addTo(map).bindTooltip('Nama Kota · Aktif', ...);
+// atau ghostIcon() untuk status "segera hadir"
+```
+Koordinat kota "coming soon" saat ini masih perkiraan random di sekitar kota tsb — update ke titik gudang asli begitu alamat pasti tersedia.
+
+**Update copy/alamat panel lokasi:**
+Cari `.loc-panel` di HTML (section `#location`) — tiap gudang adalah satu `.loc-card` dengan `data-lat`/`data-lng` (dipakai untuk fly-to saat card diklik), badge kode kota, alamat, dan thumbnail. Angka di `.loc-stats` (gudang aktif/kota tujuan/pulau) di-update manual, tidak dihitung otomatis dari data lain.
+
+**Tambah/ganti foto galeri:**
+Edit array `galItems` di `<script>` — tiap item punya `id` (photo ID dari `images.unsplash.com/photo-<id>`) dan `cap` (caption). Cara cari ID baru: buka unsplash.com, search kata kunci, ambil ID dari URL gambar hasil pencarian (`images.unsplash.com/photo-XXXXXXX`).
+
+**Ganti logo mitra ekspedisi:**
+File logo ada di `partner-logos/`. Ganti file di folder itu (nama file sama) atau tambah `<span class="mq-logo"><img src="partner-logos/nama-file"></span>` baru di `<div class="marquee-track">`.
+
+**Update kontak:**
+Nomor WA, IG, email muncul di 2 tempat — footer (`#contact`) dan floating widget (`.float-contact`). Update keduanya.
+
+## Catatan penting / known limitations
+- Foto hero & galeri masih placeholder dari Unsplash (link `images.unsplash.com/photo-<id>` langsung, bukan foto asli gudang Anagata) — ganti ke foto asli sebelum go-live. Filenya hotlink ke Unsplash, jadi butuh koneksi internet dan bisa saja suatu saat foto itu dihapus pemiliknya dari Unsplash (risiko kecil tapi ada).
+- Peta Leaflet butuh koneksi internet untuk load tile Esri — pastikan hosting akhir tidak memblokir request ke `server.arcgisonline.com`.
+- Logo mitra ekspedisi di `partner-logos/` diunduh dari situs resmi / Wikimedia Commons masing-masing brand untuk keperluan marquee "mitra terpercaya" — pastikan daftar mitra di situ memang benar-benar kerja sama aktif dengan Anagata sebelum go-live, ganti/hapus yang belum resmi.
+- Belum ada bagian **Fulfillment Fee** dan **Meet Our Team** sesuai arahan awal (sengaja dikecualikan).
+- Font Google Fonts & Leaflet di-load dari CDN eksternal — kalau butuh versi fully offline/self-hosted, download asetnya dan ganti path lokal.
+
+## Riwayat keputusan desain (ringkas)
+- Warna primary `#610890` mengikuti referensi warna dari klien, bukan gold (karena versi logo yang dipakai adalah versi putih)
+- Gaya tipografi & layout terinspirasi dari `backslash.id` (editorial, dark, tipografi jadi hero) dan `afs.backslash.id` (headline dengan italic emphasis)
+- Struktur "how it works" card + stat besar terinspirasi dari `flexe.com`
+- Section "3PL Partnership" di-rename jadi marquee logo mitra (bukan section "Our Client" statis) atas permintaan klien
+- Tidak pakai numbered section (01/02/03) — dihindari sesuai permintaan klien
+- Tidak ada badge/ornamen generik ("AI slop") — filler kekosongan pakai foto dummy relevan atau aksen grid tipis, bukan dekorasi berlebihan

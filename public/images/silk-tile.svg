@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1600" width="1440" height="1600">
+  <!-- Seamless repeat-y tile of the deck's silk: every sheen/glow stays clear of
+       the top and bottom edges (blur included), so tile joins always land on
+       plain dark background and never show a seam. Transparent background:
+       the body background colour shows through. (No double hyphens inside
+       XML comments, they make the whole SVG invalid.) -->
+  <defs>
+    <!-- region is in each path's LOCAL (pre-transform) space, so keep it generous
+         or the blur gets cut into a hard edge -->
+    <filter id="soft" filterUnits="userSpaceOnUse" x="-600" y="-600" width="2640" height="2400"><feGaussianBlur stdDeviation="38"/></filter>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset=".35" stop-color="#ffffff" stop-opacity=".11"/>
+      <stop offset=".7" stop-color="#c7b8e0" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#a855f7" stop-opacity=".30"/>
+    </linearGradient>
+    <radialGradient id="violet"><stop offset="0" stop-color="#6e14aa" stop-opacity=".42"/><stop offset=".7" stop-color="#6e14aa" stop-opacity="0"/></radialGradient>
+    <radialGradient id="steel"><stop offset="0" stop-color="#5865a0" stop-opacity=".17"/><stop offset=".7" stop-color="#5865a0" stop-opacity="0"/></radialGradient>
+  </defs>
+
+  <!-- violet bleed right (upper half), steel sheen left, violet bleed left (lower half) -->
+  <ellipse cx="1440" cy="430" rx="640" ry="380" fill="url(#violet)"/>
+  <ellipse cx="0" cy="560" rx="500" ry="330" fill="url(#steel)"/>
+  <ellipse cx="0" cy="1170" rx="620" ry="370" fill="url(#violet)"/>
+  <ellipse cx="1440" cy="1250" rx="420" ry="280" fill="url(#steel)"/>
+
+  <!-- sheen 1: the cover-slide sweep, rising bottom-left → top-right -->
+  <path filter="url(#soft)" fill="url(#sheen)" transform="translate(0 80) scale(1 .8)"
+        d="M-120 720 C200 540 430 400 720 480 S1160 400 1560 110 L1560 360 C1220 580 960 660 720 650 S200 780 -120 920 Z"/>
+  <!-- sheen 2: the closing-slide fold, mirrored so it falls the other way -->
+  <path filter="url(#soft)" fill="url(#sheen)" transform="translate(1440 820) scale(-1 .7)"
+        d="M-120 -40 L620 -40 C820 180 1060 460 1560 560 L1560 900 C1160 820 820 560 560 300 S80 120 -120 160 Z"/>
+</svg>
