@@ -166,14 +166,11 @@ admin action, that's new work, not something disabled.
 
 ## Dependency/security note
 
-`composer.json` pins `laravel/framework: ^9.19` — Laravel 9's security-support
-window ended 2024-02-06. `composer audit` currently reports 12 known advisories
-across `symfony/mailer`, `symfony/mime`, `symfony/process`, `symfony/routing`, and
-others, all frozen at `v6.0.19` (Jan 2023) despite Laravel 9.52 permitting
-`symfony/* : ^6.0` (i.e. the 6.4 LTS line is a compatible, non-breaking upgrade
-path — no Laravel major bump needed for this specific fix). Run
-`composer update symfony/mailer symfony/mime symfony/process symfony/routing
-symfony/http-kernel symfony/http-foundation --with-all-dependencies` somewhere
-with real internet access before/soon after the first production deploy, then
-`php artisan test` to confirm nothing broke. A full Laravel 9→12 upgrade is a
-separate, much larger project — not attempted here.
+At the user's request the project was restored to Laravel 9 and PHP 8.0; both are
+past official security support. CMS login uses a password and rate limiting; the
+optional two-factor feature was removed. Keep APP_KEY stable, run `composer audit
+--locked --no-dev`, and test in staging before release. Production requires a
+tested backup and compatible PHP extensions.
+The CMS section cache contains Laravel Collections, so cache deserialization
+explicitly allows only that class; do not clear or share unrelated production cache
+without checking the environment and load-balancer setup.

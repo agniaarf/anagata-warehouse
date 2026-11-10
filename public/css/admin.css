@@ -1,11 +1,11 @@
 :root{
-  --purple:#610890;
+  --purple:#7b2d9f;
   --purple-deep:#2a0440;
-  --purple-glow:#a855f7;
-  --bg:#0a0710;
-  --bg-2:#120a1c;
-  --ink:#f4f1f7;
-  --muted:#ad9fc2;
+  --purple-glow:#2efda0;
+  --bg:#080908;
+  --bg-2:#101210;
+  --ink:#f8f4ee;
+  --muted:#b8beb8;
   --line:rgba(255,255,255,.10);
 }
 
@@ -24,7 +24,7 @@ body{
   line-height:1.5;
 }
 a{color:inherit;}
-h1,h2,h3{font-family:'Instrument Serif', Georgia, serif; font-weight:400; margin:0 0 6px;}
+h1,h2,h3{font-family:'Barlow Condensed', Manrope, sans-serif; font-weight:600; margin:0 0 6px;}
 
 /* ---------- guest (login/forgot/reset/confirm) ---------- */
 .auth-page{
@@ -190,6 +190,10 @@ h1,h2,h3{font-family:'Instrument Serif', Georgia, serif; font-weight:400; margin
 .admin-section-card b{font-size:15px;}
 .admin-section-card span{display:block;color:var(--muted);font-size:12.5px;margin-top:4px;}
 .admin-section-card .admin-section-card-action{color:var(--purple-glow);font-size:12px;font-weight:600;margin-top:12px;}
+.admin-home-shortcuts{margin-bottom:28px;}
+.admin-archive{margin-top:36px;border-top:1px solid var(--line);padding-top:20px;}
+.admin-archive > summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;}
+.admin-archive > p{color:var(--muted);font-size:13px;line-height:1.6;margin:12px 0 18px;}
 
 /* ---------- homepage sections ---------- */
 .section-list{display:flex;flex-direction:column;gap:10px;}
@@ -292,6 +296,28 @@ h1,h2,h3{font-family:'Instrument Serif', Georgia, serif; font-weight:400; margin
 .dropzone-hint{font-size:11px;color:var(--muted);opacity:.7;}
 .dropzone.is-uploading{opacity:.55;pointer-events:none;}
 
+/* Website palette and typography, tuned for readable admin controls. */
+::selection{background:#7b2d9f;color:#f8f4ee;}
+.admin-main{background:linear-gradient(110deg,rgba(8,9,8,.97),rgba(8,9,8,.94)),url('/anagata-images/topography.svg') center top/900px auto;}
+.admin-sidebar{background:#090b09;border-color:rgba(123,45,159,.48);}
+.admin-sidebar-brand{padding:2px 2px 20px;border-bottom:1px solid rgba(248,244,238,.12);}
+.admin-side-link.active{background:rgba(46,253,160,.09);color:#2efda0;box-shadow:inset 2px 0 #2efda0;}
+.admin-side-link:hover{color:#2efda0;}
+.admin-header h2{font-size:clamp(34px,4vw,52px);line-height:.95;letter-spacing:-.02em;text-transform:uppercase;}
+.admin-header p a,.form-link,.section-card-edit-link,.admin-section-card .admin-section-card-action,.dropzone-browse{color:#2efda0;}
+.admin-card,.section-card,.admin-section-card,.analytics-metric-card{background:rgba(16,18,16,.96);border-color:rgba(248,244,238,.13);border-radius:4px;}
+.admin-section-card:hover,.content-list-item[open],.dropzone:hover{border-color:rgba(46,253,160,.65);}
+.content-list-item,.content-add-item,.field-input,.field-textarea,.field-select,.btn{border-radius:4px;}
+.content-list-item > summary:hover{background:rgba(46,253,160,.04);}
+.content-list-item[open] > summary .meta{color:#2efda0;}
+.field-input:focus,.field-textarea:focus,.field-select:focus{outline:2px solid rgba(46,253,160,.35);outline-offset:1px;border-color:#2efda0;}
+.btn-admin-solid{background:#2efda0;color:#080908;}
+.btn-admin-solid:hover{background:#f8f4ee;color:#080908;}
+.section-nav-checkbox input[type=checkbox]:checked::after{border-color:#080908;}
+.auth-page{background:linear-gradient(rgba(8,9,8,.94),rgba(8,9,8,.94)),url('/anagata-images/topography.svg') center/850px;}
+.auth-card{border-radius:4px;border-color:rgba(123,45,159,.6);}
+.admin-sidebar-toggle{color:#2efda0;}
+
 hr.admin-sep{border:none;border-top:1px solid var(--line);margin:24px 0;}
 
 @media (max-width:640px){
@@ -326,6 +352,7 @@ hr.admin-sep{border:none;border-top:1px solid var(--line);margin:24px 0;}
 .order-controls button:hover{border-color:var(--line);background:rgba(168,85,247,.08);color:var(--ink);}
 .order-controls button:focus-visible{outline:2px solid var(--purple-glow);outline-offset:2px;}
 .content-item-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:8px;margin-bottom:10px;}
+.content-item-row--locked{grid-template-columns:minmax(0,1fr);}
 .content-list-item{min-width:0;margin-bottom:0;}
 .content-order-controls{align-self:center;}
 .content-item-tools{display:flex;justify-content:flex-end;margin-bottom:12px;}
@@ -373,3 +400,47 @@ hr.admin-sep{border:none;border-top:1px solid var(--line);margin:24px 0;}
 @media (max-width:900px){
   .admin-toast-stack{top:62px;}
 }
+.video-field .image-field-preview{width:100%;max-height:280px;object-fit:cover;background:#09080d;}
+.video-field .image-field-preview.is-empty{display:none;}
+@media (max-width:640px){.admin-main{padding:0;}.admin-main-inner{padding:70px 16px 60px;}}
+
+/* Anagata workspace: violet and black, with restrained mint and orange accents. */
+:root{--bg:#09070c;--bg-2:#180d20;--purple:#7b2d9f;--purple-deep:#421454;--purple-glow:#2efda0;--ink:#f8f4ee;--muted:#c4bac8;--line:rgba(224,197,238,.16);}
+.admin-main{background:linear-gradient(145deg,rgba(25,10,35,.93),rgba(8,7,11,.98) 54%),url('/anagata-images/topography.svg') center top/1050px auto;}
+.admin-sidebar{background:linear-gradient(180deg,#1b0b26,#0b080e 58%);border-right:1px solid rgba(123,45,159,.55);}
+.admin-sidebar-brand{border-bottom:1px solid rgba(243,232,248,.14);}
+.admin-side-link{border-radius:4px;}
+.admin-side-link.active{background:rgba(123,45,159,.3);box-shadow:inset 3px 0 #2efda0;color:#f8f4ee;}
+.admin-side-link:hover{background:rgba(123,45,159,.18);color:#f8f4ee;}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid rgba(217,190,230,.15);padding-bottom:20px;margin-bottom:36px;color:#c9bbd0;font-size:10px;font-weight:700;letter-spacing:.1em;}
+.admin-topbar > div{display:flex;align-items:center;gap:10px;min-width:0;}
+.admin-topbar-mark{display:grid;place-items:center;width:34px;height:34px;background:#7b2d9f;color:#fff;font:700 15px 'Barlow Condensed',sans-serif;letter-spacing:.03em;}
+.admin-topbar i{color:#f19e0d;font-style:normal;margin:0 4px;}
+.admin-topbar > a{white-space:nowrap;text-decoration:none;color:#f8f4ee;border:1px solid rgba(201,187,208,.36);padding:10px 13px;transition:border-color .2s,color .2s;}
+.admin-topbar > a:hover{border-color:#2efda0;color:#2efda0;}
+.admin-topbar > a span{color:#2efda0;margin-left:5px;}
+.admin-header{max-width:760px;margin-bottom:30px;}
+.admin-header h2{color:#f8f4ee;font-size:clamp(42px,5vw,65px);}
+.admin-header p{max-width:620px;line-height:1.7;}
+.admin-card,.section-card,.analytics-metric-card{background:rgba(26,14,34,.96);border-color:rgba(179,121,202,.25);border-radius:6px;}
+.content-dashboard-card{display:flex;position:relative;overflow:hidden;flex-direction:column;min-height:190px;padding:22px;background:linear-gradient(140deg,#2c123b,#180d20 68%);border:1px solid rgba(170,111,196,.26);border-radius:6px;transition:transform .2s,border-color .2s,background .2s;}
+.content-dashboard-card::after{content:'';position:absolute;right:-32px;top:-45px;width:100px;height:100px;border:1px solid rgba(248,244,238,.08);border-radius:50%;pointer-events:none;}
+.content-dashboard-card:hover{transform:translateY(-3px);border-color:#a95acb;background:linear-gradient(140deg,#3a194a,#1b0d23 70%);}
+.content-dashboard-card .content-card-number{display:flex;align-items:center;justify-content:space-between;color:#f19e0d;font:600 15px 'Barlow Condensed',sans-serif;letter-spacing:.1em;margin:0 0 24px;}
+.content-dashboard-card .content-card-number span{color:#2efda0;font:600 17px Manrope,sans-serif;margin:0;}
+.content-dashboard-card b{font:600 24px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.01em;text-transform:uppercase;}
+.content-dashboard-card .content-card-description{color:#c9bdcf;font-size:12px;line-height:1.55;margin:8px 0 18px;}
+.content-dashboard-card .admin-section-card-action{margin-top:auto;color:#2efda0;font-size:11px;letter-spacing:.03em;}
+.content-dashboard-seo{border-color:rgba(241,158,13,.4);}
+.btn-admin-solid{background:#7b2d9f;color:#fff;}
+.btn-admin-solid:hover{background:#9650b2;color:#fff;}
+.btn-admin-solid:focus-visible,.admin-topbar a:focus-visible,.admin-section-card:focus-visible,.admin-side-link:focus-visible{outline:2px solid #2efda0;outline-offset:3px;}
+.content-list-item{background:rgba(123,45,159,.08);border-color:rgba(186,139,205,.2);}
+.content-list-item[open]{border-color:rgba(46,253,160,.6);}
+.field-input,.field-textarea,.field-select{background:#0d0911;border-color:rgba(198,166,213,.25);}
+.field-hint{color:#c4bac8;}
+.dropzone{background:rgba(123,45,159,.09);border-color:rgba(198,166,213,.3);}
+.auth-page{background:linear-gradient(rgba(13,7,17,.9),rgba(8,7,11,.97)),url('/anagata-images/topography.svg') center/850px;}
+.auth-card{background:#1b0d24;border-color:rgba(186,139,205,.35);}
+@media(max-width:640px){.admin-topbar{margin-bottom:28px;padding-bottom:15px;}.admin-topbar > div > span:last-child{max-width:125px;line-height:1.4;}.admin-topbar > a{font-size:9px;padding:9px;}.content-dashboard-card{min-height:165px;padding:18px;}.content-dashboard-card .content-card-number{margin-bottom:15px;}}
+@media(prefers-reduced-motion:reduce){.content-dashboard-card,.admin-topbar > a{transition:none;}}

@@ -12,11 +12,13 @@
   $logo = \App\Support\Cms::imageUrl(cms_field($cms['site_settings'], 'logo_light'));
 @endphp
 <!-- CONTACT -->
-<section id="contact" class="contact-section" data-analytics-section="contact">
-  <div class="wrap contact-center">
+<section id="contact" class="contact-section contact-cinematic" data-analytics-section="contact">
+  <div class="contact-image" aria-hidden="true" style="background-image:url('{{ \App\Support\Cms::largeUrl(cms_field($cms['team_note'], 'image')) }}')"></div>
+  <div class="wrap contact-center reveal-on-scroll">
     <div class="eyebrow">{{ cms_field($f, 'eyebrow') }}</div>
-    <h2>{!! cms_rich_text(cms_field($f, 'headline')) !!}</h2>
-    <div class="hero-hash contact-hash">{{ cms_field($f, 'tagline') }}</div>
+    <h2 class="contact-anagata-title">#Let'sGrowTogether</h2>
+    <p class="contact-invitation">Ceritakan kebutuhan fulfillment bisnismu.<br>Tim kami siap mendengarkan.</p>
+
     <a href="https://wa.me/{{ $wa }}?text={{ urlencode($waText) }}" target="_blank" rel="noopener" class="btn btn-solid foot-wa-btn" data-analytics-contact="whatsapp">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
       {{ cms_field($f, 'cta_label') }}
@@ -25,7 +27,7 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
+<footer class="footer-editorial">
   <div class="wrap">
     <div class="foot-top">
       <div class="foot-brand">
@@ -42,7 +44,12 @@
         @endif
       </div>
       <div class="foot-col">
-        <h4>Ikuti Kami</h4>
+        <h4>Say Hello</h4>
+        <a href="mailto:{{ $email }}" data-analytics-contact="email">{{ $email }}</a>
+        <a href="tel:+{{ $wa }}">+{{ $wa }}</a>
+      </div>
+      <div class="foot-col">
+        <h4>Follow Our Journey</h4>
         <div class="foot-social">
           <a href="https://wa.me/{{ $wa }}?text={{ urlencode($waText) }}" target="_blank" rel="noopener" aria-label="WhatsApp" data-analytics-contact="whatsapp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
@@ -54,12 +61,12 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
           </a>
         </div>
-        <div style="margin-top:14px;">{{ $email }}</div>
       </div>
     </div>
     <div class="foot-bottom">
       <div>© {{ date('Y') }} {{ cms_field($f, 'copyright_holder') }}</div>
       <div class="hero-hash">{{ cms_field($f, 'tagline') }}</div>
+      <a href="#meaning">Kembali ke atas ↑</a>
     </div>
     <p class="analytics-disclosure">Statistik penggunaan anonim membantu kami memahami section yang dilihat. Fitur ini tidak menyimpan alamat IP mentah.</p>
   </div>

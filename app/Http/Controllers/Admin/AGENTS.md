@@ -111,6 +111,11 @@ Two separate things named "image":
    `images.unsplash.com` or `asset('images/...')` directly — see `docs/DATABASE.md`
    for which). `HandlesCmsFields`'s image validator accepts HTTPS URLs or a stored
    relative path with an image extension; it rejects `data:` URIs specifically.
+3. **`type: 'video'` schema fields** — intro video accepts WebM/MP4 up to 20MB.
+   `VideoUploadService` checks the actual EBML/ISO-BMFF container signature rather
+   than trusting the extension or browser MIME type. Store the returned relative
+   path; keep a required poster image because reduced-motion, slow networks, and
+   unsupported codecs must still render the opening.
 
 ## Auth — no roles, two equal admin accounts
 

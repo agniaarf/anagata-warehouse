@@ -67,6 +67,10 @@ ini ke git kalau nanti `git init` — sudah ada di `.gitignore`).
 5. `php artisan migrate --force` — bikin skema tabel di database production.
    **Ini satu-satunya perintah database yang boleh dijalankan ulang kapan pun**
    (idempotent, cuma menjalankan migration yang belum pernah jalan).
+   Landing V2 masuk lewat migration `2026_10_30_000000_add_landing_v2_content`:
+   migration ini additive, hanya menambah key V2 yang belum ada dan menonaktifkan
+   layout V1. Untuk upgrade situs yang sudah live, cukup jalankan command ini;
+   **jangan ikuti dengan `db:seed`**.
 6. `php artisan db:seed --force` — **JALANKAN SEKALI SAJA**, saat pertama kali
    deploy, untuk mengisi `cms_contents` dengan konten awal (sama seperti yang ada
    di local dev sekarang — itu maksud "yang sekarang nanti ke production disamain").
@@ -93,14 +97,11 @@ ini ke git kalau nanti `git init` — sudah ada di `.gitignore`).
     tetap aman dijalankan ulang, `updateOrCreate` di email yang sama hanya reset
     password kalau env var itu memang diisi ulang).
 
-**⚠️ Sebelum/segera setelah deploy pertama** — cek `docs/CODEBASE.md`'s bagian
-"Dependency/security note": `laravel/framework` masih di `^9.19` (security support
-berakhir 2024-02-06), dan `composer audit` melaporkan 12 advisory di beberapa
-paket Symfony yang masih di versi Januari 2023. Jalankan `composer update
-symfony/mailer symfony/mime symfony/process symfony/routing symfony/http-kernel
-symfony/http-foundation --with-all-dependencies` di lingkungan dengan akses
-internet (bukan sandbox tanpa akses packagist), lalu `php artisan test`, sebelum
-situs benar-benar publik.
+**Keamanan dependency:** atas permintaan pengguna project kembali memakai Laravel 9
+dan PHP 8.0. Laravel 9 dan PHP 8.0 sudah tidak mendapat dukungan keamanan resmi.
+Audit dependency sebelum deploy dan uji di staging. Backup database, upload, dan
+APP_KEY; jangan jalankan seeder pada database yang berisi konten admin.
+Fitur 2FA CMS dicabut atas permintaan pengguna; kolom database historis dipertahankan.
 
 **Mail belum dikonfigurasi** — `.env.production` masih `MAIL_MAILER=log`, artinya
 email reset password ditulis ke log, bukan benar-benar terkirim. Ini tidak
@@ -292,17 +293,31 @@ File HTML statis lama disimpan sebagai referensi di `legacy/anagata-landing.html
 
 ## Struktur section (urutan di halaman, per `config/page_sections.php` default_order — bisa diubah admin lewat `/bojong/website`)
 
-1. **Nav** (`partials/nav.blade.php`) — fixed, logo + menu + tombol Contact Us
-2. **Hero** (`#home`) — **full-bleed background slider** (foto mengisi seluruh layar di belakang nav+copy, BUKAN foto di kolom kanan lagi — dikembalikan ke gaya static-HTML lama atas permintaan klien): carousel 4 foto cross-fade + slow zoom (autoplay 5 detik, di-skip kalau `prefers-reduced-motion`), overlay gradient supaya teks kiri tetap terbaca, headline italic emphasis, tagline `#Let'sGrowTogether`, stat+dots dipin di kanan-bawah (mobile: kiri-bawah sejajar dot)
-3. **Marquee** — logo mitra ekspedisi, infinite scroll. Tile putih ukuran tetap (176×76 desktop), logo di-fit by width DAN height (`object-fit:contain`) supaya logo kotak (ID Express, Pos, SAP) tidak mengecil jadi 20px. Jarak atas (dari dots hero) = jarak bawah (ke judul Services): `padding-top` marquee + offset `.hero-meta` = `padding-top` section berikutnya, per breakpoint (lihat komentar di `app.css`).
-4. **Services** (`#services`) — **flip card** (`.service-grid`/`.flip-card`), dikembalikan dari tabbed "pipeline" atas permintaan klien (2026-09-30). Depan: judul + flow vertikal (`flow_steps`) + hint + "Lihat detail →"; belakang: judul + `.step-list` (`back_steps`). Hover = flip di desktop (CSS, `(hover:hover) and (pointer:fine)`), tap/Enter/Space = toggle `.flipped` (`app.js`). Tinggi kartu tetap (perlu untuk flip 3D); list belakang yang panjang (Outbound, 7 langkah) scroll di dalam kartu. Data tetap repeater CMS `services.card`.
-5. **Stats** (tanpa `id` anchor) — angka kredibilitas besar (repeater `stats.stat`, dulu bagian dari section "Credibility" yang sudah dipecah jadi `stats` + `testimonials` terpisah).
-6. **About** (`#about`) — Visi & Misi + foto tim. Catatan: sekarang urutannya SETELAH Services & Stats, bukan sebelum seperti versi awal.
-7. **Value Proposition** (tanpa `id` anchor) — heading "Ini alasan seller pilih *Anagata&nbsp;Warehouse.*" + 4 stat editorial.
-8. **Location** (`#location`) — peta Leaflet + panel kanan, data 100% dari CMS repeater `location.card` (lihat Stack di atas).
-9. **Gallery** (`#gallery`) — **preview bento tetap 8 tile** (`.gallery-bento`/`.bento-item`) + **lightbox** (`<dialog id="galleryLightbox">`). Tinggi section TIDAK bertambah walau foto banyak: tile ke-8 jadi "+N" dan tombol "Lihat semua foto (N)" (label dari field CMS `gallery.view_all_label`) membuka viewer layar penuh (panah/keyboard/swipe, strip thumbnail). Grid pakai `Cms::thumbUrl()` (file `.thumb.webp` 720px), lightbox pakai `Cms::largeUrl()` — foto besar baru diunduh saat viewer dibuka. Kurang dari 8 foto → grid rata biasa. (Riwayat: pagination 4-foto → masonry semua foto → bento+lightbox.)
-10. **Testimonials** (tanpa `id` anchor) — kutipan pelanggan dengan avatar inisial, repeater `testimonials.testimonial` (dulu bagian dari "Credibility", sekarang section terpisah, posisinya SETELAH Gallery bukan sebelum Value Proposition seperti versi awal).
-11. **Contact/Footer** (`#contact`) — heading + tombol "Konsultasi Disini", logo, kontak, daftar gudang, copyright.
+1. **Intro** (`#intro`) — full-screen poster/video WebM/MP4, wordmark gradient
+   mint→violet, `#Let'sGrowTogether`, dan tombol `START YOUR JOURNEY`. Intro tampil
+   sekali per browser session; hash link langsung melewatinya.
+2. **Meaning** (`#meaning`) — arti Anagata dalam format story full-bleed dengan
+   foto manusia dan overlay violet.
+3. **History** (`#history`) — perjalanan ringkas 3–5 milestone; potongan foto mulai
+   membentuk collage saat scroll.
+4. **Team Note** (`#team-note`) — Sekapur Sirih atas nama Tim Anagata Warehouse.
+5. **Collage Finale** (`#collage-finale`) — 10–16 tile desktop (maksimal 6 yang
+   ditampilkan di mobile), ditutup `We grow by helping others grow.`.
+6. **Inbound** (`#inbound`) — awal main website dan titik header/nav mulai muncul.
+7. **Outbound** (`#outbound`) — CTA WhatsApp pertama baru muncul di section ini.
+8. **Return** (`#return`) — penanganan return dengan pendekatan human-first.
+9. **Location** (`#location`) — layout foto dan daftar lokasi dari CMS. Gudang
+   aktif menaut ke Google Maps; lokasi rencana diberi label "Segera hadir".
+10. **Contact/Footer** (`#contact`) — penutup full-bleed, CTA kontak, lokasi,
+    social, dan copyright.
+
+Setelah collage ada chapter editorial **People · Process · Purpose**. Copy
+chapter tersebut dan pengantar collage masih dibuat langsung di Blade selama
+fase review visual; integrasi CMS-nya menyusul setelah desain disetujui.
+
+Section V1 (`hero`, `marquee`, `services`, `stats`, `about`, `value_prop`,
+`gallery`, `testimonials`) tetap terdaftar dan datanya dipertahankan agar rollback
+aman, tetapi default-nya tidak ditampilkan pada V2.
 
 ## Design tokens (di `public/css/app.css`, `:root`)
 | Token | Nilai | Peran |
@@ -355,9 +370,8 @@ belum ada sama sekali (bukan cuma reorder yang sudah ada), lihat langkah di
 - Logo mitra ekspedisi di `public/partner-logos/` — pastikan daftar mitra memang
   masih kerja sama aktif sebelum go-live.
 - Belum ada bagian **Fulfillment Fee** dan **Meet Our Team** (sengaja dikecualikan).
-- `laravel/framework` masih `^9.19` (EOL security support 2024-02-06), 12 advisory
-  di `composer audit` per audit pre-production (2026-09) — lihat bagian Deploy di
-  atas dan `docs/CODEBASE.md` untuk remediasi yang tidak butuh upgrade major.
+- Laravel 9 dan PHP 8.0 tidak lagi mendapat dukungan keamanan resmi. Audit
+  dependency dan uji staging sebelum deploy production.
 - Cleanup pre-production (2026-09): dihapus — Breeze scaffold yang tidak pernah
   dipakai (`dashboard.blade.php`, tombol danger/secondary, route+view+test
   konfirmasi password yang tidak pernah di-link ke mana pun), file prototype

@@ -54,10 +54,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
-<link rel="preload" as="image" href="{{ \App\Support\Cms::imageUrl(cms_items($cms['hero'])->first()['value']['image'] ?? '') }}" fetchpriority="high">
+<link rel="preload" as="image" href="{{ \App\Support\Cms::imageUrl(cms_field($cms['intro'], 'poster_image')) }}" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+<script>
+  document.documentElement.classList.add('js');
+  const anagataIntroShowOnce = @json(cms_field($cms['intro'], 'show_once', '1') !== '0');
+  try {
+    if (!location.hash && (!anagataIntroShowOnce || sessionStorage.getItem('anagata.journey.completed.v2') !== '1')) {
+      document.documentElement.classList.add('has-intro');
+    }
+  } catch (_) {
+    if (!location.hash) document.documentElement.classList.add('has-intro');
+  }
+</script>
 <style>
   :root {
     --purple: {{ cms_field($ss, 'brand_color_primary', '#610890') }};
@@ -147,12 +158,21 @@
 @include('partials.nav')
 @php
   $layout = cms_items($cms['page_layout'])->sortBy('order');
+  // Anagata story sequence; visibility continues to follow the saved layout.
+  $anagataOrder = ['intro', 'collage_finale', 'team_note', 'meaning', 'history', 'inbound', 'outbound', 'return', 'location', 'footer'];
+  $layout = $layout->sortBy(fn ($entry) => (($index = array_search($entry['key'], $anagataOrder, true)) === false) ? 1000 + $entry['order'] : $index);
   $pageSections = config('page_sections');
 @endphp
-@foreach($layout as $entry)
-  @continue(! $entry['value']['visible'])
-  @include($pageSections[$entry['key']]['view'])
-@endforeach
+<main>
+  @php $hasServiceExperience = $layout->contains(fn ($entry) => $entry['key'] === 'inbound' && $entry['value']['visible']); @endphp
+  @foreach($layout as $entry)
+    @continue(! $entry['value']['visible'] || ! isset($pageSections[$entry['key']]))
+    @continue($hasServiceExperience && in_array($entry['key'], ['outbound', 'return'], true))
+    @include($pageSections[$entry['key']]['view'])
+    @if($entry['key'] === 'intro') @include('partials.journey-stories') @endif
+    @if(($entry['key'] === 'history' || ($entry['key'] === 'collage_finale' && ! $layout->contains(fn ($item) => $item['key'] === 'history' && $item['value']['visible']))) && $layout->contains(fn ($item) => $item['key'] === 'collage_finale' && $item['value']['visible'])) @include('partials.explore-hub') @endif
+  @endforeach
+</main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}"></script>

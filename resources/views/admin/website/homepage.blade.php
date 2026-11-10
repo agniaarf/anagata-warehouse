@@ -4,9 +4,17 @@
 <x-app-layout>
     <div class="admin-header">
         <h2>Halaman utama</h2>
-        <p>Pilih bagian yang ingin diubah. Tekan Simpan setelah mengedit teks. Pengaturan tampilan dan urutan tersimpan otomatis.</p>
+        <p>Kelola isi website dan lihat hasilnya sebelum dipublikasikan.</p>
     </div>
 
+    <div class="admin-section-grid admin-home-shortcuts">
+        <a class="admin-section-card" href="{{ route('admin.content.index') }}"><b>Kelola konten</b><span>Cerita, layanan, kolase, lokasi, dan mitra.</span><span class="admin-section-card-action">Buka konten →</span></a>
+        <a class="admin-section-card" href="{{ route('admin.settings.show', 'contact') }}"><b>Informasi kontak</b><span>Atur WhatsApp, email, dan Instagram.</span><span class="admin-section-card-action">Buka pengaturan →</span></a>
+        <a class="admin-section-card" href="{{ route('landing.preview') }}" target="_blank" rel="noopener noreferrer"><b>Preview website</b><span>Lihat tampilan halaman yang sedang dikelola.</span><span class="admin-section-card-action">Buka preview ↗</span></a>
+    </div>
+    <details class="admin-archive">
+    <summary>Pengaturan versi sebelumnya</summary>
+    <p>Pengaturan tampilan dan urutan di bawah berlaku untuk website sebelumnya.</p>
     <div class="section-list">
         @foreach($layout as $i => $entry)
             @php
@@ -72,4 +80,5 @@
             </div>
         @endforeach
     </div>
+    </details>
 </x-app-layout>

@@ -42,4 +42,19 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_old_two_factor_data_does_not_block_normal_login(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill([
+            'two_factor_secret' => 'legacy-encrypted-secret',
+            'two_factor_recovery_codes' => 'legacy-encrypted-codes',
+            'two_factor_confirmed_at' => now(),
+        ])->save();
+
+        $this->post(route('login'), ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect(RouteServiceProvider::HOME);
+        $this->assertAuthenticatedAs($user);
+        $this->get('/bojong/security/two-factor')->assertNotFound();
+    }
 }

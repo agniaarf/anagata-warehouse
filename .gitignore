@@ -38,4 +38,5 @@ Thumbs.db
 /deploy-once.php
 /fix-permissions.php
 /storage-link-fix.php
+/tmp/
 /deploy-app-htaccess.txt

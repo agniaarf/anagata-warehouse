@@ -33,6 +33,32 @@ class ImageUploadTest extends TestCase
         Storage::disk('public')->assertExists($path);
     }
 
+    public function test_valid_mp4_container_is_stored_for_intro_video(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $mp4Header = "\0\0\0\x18ftypisom\0\0\0\0isom";
+
+        $response = $this->actingAs($user)->postJson(route('admin.uploads.store'), [
+            'video' => UploadedFile::fake()->createWithContent('intro.mp4', $mp4Header),
+            'folder' => 'intro',
+        ])->assertOk();
+
+        $path = $response->json('path');
+        $this->assertStringEndsWith('.mp4', $path);
+        $this->assertSame('video', $response->json('media_type'));
+        Storage::disk('public')->assertExists($path);
+    }
+
+    public function test_fake_video_is_rejected_even_with_mp4_extension(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->postJson(route('admin.uploads.store'), [
+            'video' => UploadedFile::fake()->createWithContent('intro.mp4', 'not a video container'),
+        ])->assertUnprocessable()->assertJsonValidationErrors('video');
+    }
+
     public function test_large_upload_also_gets_a_grid_thumbnail(): void
     {
         if (! function_exists('imagewebp')) {
@@ -87,7 +113,7 @@ class ImageUploadTest extends TestCase
             'image' => UploadedFile::fake()->create('banner.png', 2049, 'image/png'),
         ])->assertUnprocessable();
 
-        $this->assertSame(['validation.max.file'], $response->json('errors.image'));
+        $this->assertSame(['Ukuran foto maksimal 2 MB.'], $response->json('errors.image'));
     }
 
     public function test_upload_rejects_images_with_excessive_pixel_dimensions_before_decoding(): void

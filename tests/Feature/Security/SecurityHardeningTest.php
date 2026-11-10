@@ -83,7 +83,7 @@ class SecurityHardeningTest extends TestCase
             ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
             ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
             ->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-            ->assertHeader('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'");
+            ->assertHeader('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'");
 
         $this->actingAs(User::factory()->create())
             ->get(route('admin.website.homepage'))
@@ -105,8 +105,9 @@ class SecurityHardeningTest extends TestCase
 
     public function test_cms_rich_text_escapes_active_markup_and_keeps_only_expected_formatting(): void
     {
+        config(['landing.anagata_enabled' => false]); // Legacy Blade rich-text rendering.
         $this->seed(CmsContentSeeder::class);
-        Content::putField('hero', 'headline', 'Safe <img src=x onerror=alert(1)> <em>format</em><br>next');
+        Content::putField('meaning', 'headline', 'Safe <img src=x onerror=alert(1)> <em>format</em><br>next');
 
         $this->get('/')
             ->assertOk()

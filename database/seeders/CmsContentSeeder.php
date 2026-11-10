@@ -11,6 +11,7 @@ class CmsContentSeeder extends Seeder
     {
         $this->seedSiteSettings();
         $this->seedPageLayout();
+        $this->seedLandingV2();
         $this->seedHero();
         $this->seedAbout();
         $this->seedServices();
@@ -32,8 +33,8 @@ class CmsContentSeeder extends Seeder
         // Logo/favicon seeded as absolute URLs to the existing static files (same
         // passthrough bridge used for marquee logos) — admin can replace them with
         // an upload later without needing a day-one re-hosting pass.
-        Content::putField('site_settings', 'logo_light', asset('images/logo-light.png'));
-        Content::putField('site_settings', 'logo_dark', asset('images/logo-dark.png'));
+        Content::putField('site_settings', 'logo_light', '/images/logo-light.png');
+        Content::putField('site_settings', 'logo_dark', '/images/logo-dark.png');
         Content::putField('site_settings', 'favicon', asset('images/favicon.png'));
         Content::putField('site_settings', 'brand_color_primary', '#610890');
         Content::putField('site_settings', 'brand_color_glow', '#a855f7');
@@ -49,10 +50,109 @@ class CmsContentSeeder extends Seeder
     {
         foreach (config('page_sections') as $slug => $meta) {
             Content::putItem('page_layout', $slug, [
-                'visible' => true,
+                'visible' => $meta['default_visible'] ?? true,
                 'show_in_nav' => $meta['default_show_in_nav'],
                 'nav_label' => $meta['default_nav_label'],
             ], $meta['default_order']);
+        }
+    }
+
+    public function seedLandingV2(): void
+    {
+        $fields = [
+            'intro' => [
+                'brand' => 'ANAGATA', 'subbrand' => 'WAREHOUSE', 'hashtag' => "#Let'sGrowTogether",
+                'cta_label' => 'START YOUR JOURNEY', 'poster_image' => '/images/anagata-intro-poster.webp',
+                'video_webm' => '', 'video_mp4' => '', 'overlay_opacity' => '38',
+                'playback_rate' => '0.6', 'show_once' => '1',
+            ],
+            'meaning' => [
+                'eyebrow' => 'Arti Anagata',
+                'headline' => 'Harapan baik,<br><em>yang tumbuh bersama.</em>',
+                'body' => 'Anagata berarti harapan yang baik. Bukan hanya untuk bisnis yang menitipkan prosesnya kepada kami, tetapi juga untuk tim, kurir, buyer, dan setiap orang yang bergerak di dalam perjalanan sebuah paket.<br><br>Kami percaya pertumbuhan yang berarti tidak pernah berjalan sendirian.',
+                'image' => 'https://images.unsplash.com/photo-1664382953403-fc1ac77073a0?w=1600&q=85&auto=format&fit=crop',
+                'image_alt' => 'Tim operasional Anagata bekerja bersama di area warehouse',
+                'image_position' => 'center', 'overlay_opacity' => '42',
+            ],
+            'history' => [
+                'eyebrow' => 'Sejarah Anagata',
+                'headline' => 'Dimulai dari kebutuhan<br><em>yang nyata.</em>',
+                'body' => 'Anagata Warehouse berdiri di bawah CV Anagata Satria Nusantara sejak 2024. Kami tumbuh dari pemahaman sederhana: pemilik bisnis seharusnya punya lebih banyak waktu untuk mengembangkan brand, bukan tenggelam dalam urusan stok dan pengiriman.',
+                'image' => 'https://images.unsplash.com/photo-1601598704991-eef6114775e0?w=1600&q=85&auto=format&fit=crop',
+                'image_alt' => 'Aktivitas awal operasional dan penyimpanan di warehouse Anagata',
+                'image_position' => 'center', 'overlay_opacity' => '44',
+            ],
+            'team_note' => [
+                'eyebrow' => 'Sekapur Sirih',
+                'headline' => 'Di balik setiap paket,<br><em>ada manusia yang peduli.</em>',
+                'body' => 'Bagi kami, warehouse bukan sekadar rak, sistem, dan angka. Ia adalah tempat kepercayaan dititipkan setiap hari.<br><br>Kami belajar, memperbaiki proses, dan bergerak bersama agar setiap produk yang masuk dapat melanjutkan perjalanannya dengan lebih baik. Terima kasih telah memberi kami ruang untuk tumbuh bersama bisnis Anda.',
+                'signature' => '— Tim Anagata Warehouse',
+                'image' => 'https://images.unsplash.com/photo-1700725254159-2b1342b4f0af?w=1600&q=85&auto=format&fit=crop',
+                'image_alt' => 'Tim Anagata Warehouse saat berdiskusi dan menjalankan operasional',
+                'image_position' => 'center', 'overlay_opacity' => '42',
+            ],
+            'collage_finale' => [
+                'headline' => 'We grow by helping<br><em>others grow.</em>',
+                'hashtag' => "#Let'sGrowTogether",
+            ],
+            'inbound' => [
+                'eyebrow' => 'Inbound',
+                'headline' => 'Setiap barang datang<br><em>dengan kepercayaan.</em>',
+                'body' => 'Tim kami menerima, membuka, memeriksa, dan mencatat setiap produk sebelum masuk ke rak. Bukan sekadar barang masuk—ini adalah awal agar stok bisnis Anda tetap rapi dan dapat dipercaya.',
+                'image' => 'https://images.unsplash.com/photo-1664382953403-fc1ac77073a0?w=1400&q=85&auto=format&fit=crop',
+                'image_alt' => 'Tim warehouse melakukan unboxing dan pemeriksaan barang inbound',
+                'steps' => json_encode(['Receiving', 'Checking & Unboxing', 'Counting & Update Data', 'Putaway'], JSON_UNESCAPED_UNICODE),
+                'cta_label' => '',
+            ],
+            'outbound' => [
+                'eyebrow' => 'Outbound',
+                'headline' => 'Dari rak menuju pelanggan,<br><em>dikerjakan dengan teliti.</em>',
+                'body' => 'Setiap order diverifikasi, diambil, diperiksa, dikemas, lalu disortir sebelum diserahkan kepada ekspedisi. Di setiap tahap, ada orang yang memastikan pesanan bergerak dengan benar.',
+                'image' => 'https://images.unsplash.com/photo-1740914994657-f1cdffdc418e?w=1400&q=85&auto=format&fit=crop',
+                'image_alt' => 'Tim Anagata melakukan packing pesanan sesuai prosedur',
+                'steps' => json_encode(['Order Processing', 'Picking & Quality Control', 'Packing', 'Sorting & 3PL Handover'], JSON_UNESCAPED_UNICODE),
+                'cta_label' => 'Bicarakan kebutuhan fulfillment Anda',
+            ],
+            'return' => [
+                'eyebrow' => 'Return',
+                'headline' => 'Barang kembali tetap<br><em>ditangani dengan baik.</em>',
+                'body' => 'Paket return kami terima, buka, periksa, dan catat kembali kondisinya. Produk yang masih layak akan kembali ke inventory; sisanya dilaporkan agar keputusan berikutnya tetap transparan.',
+                'image' => 'https://images.unsplash.com/photo-1700727448575-6f1680cd7d75?w=1400&q=85&auto=format&fit=crop',
+                'image_alt' => 'Tim melakukan quality control terhadap paket return',
+                'steps' => json_encode(['Receiving Return', 'Checking & Unboxing', 'QC Report', 'Restock atau Klaim'], JSON_UNESCAPED_UNICODE),
+                'cta_label' => '',
+            ],
+        ];
+
+        foreach ($fields as $section => $values) {
+            foreach ($values as $key => $value) {
+                Content::putField($section, $key, (string) $value);
+            }
+        }
+
+        $milestones = [
+            ['year' => '2024', 'title' => 'Anagata dimulai', 'description' => 'CV Anagata Satria Nusantara memulai layanan fulfillment dan home packing.', 'image' => 'https://images.unsplash.com/photo-1601598505513-7489a6272d2a?w=900&q=80&auto=format&fit=crop', 'image_alt' => 'Area warehouse Anagata pada masa awal operasional'],
+            ['year' => 'Hari ini', 'title' => 'Lebih dekat dengan seller', 'description' => 'Operasional Jakarta dan Makassar membantu bisnis menjangkau pelanggan dari dua wilayah.', 'image' => 'https://images.unsplash.com/photo-1605745341112-85968b19335b?w=900&q=80&auto=format&fit=crop', 'image_alt' => 'Aktivitas operasional warehouse Anagata'],
+            ['year' => 'Ke depan', 'title' => 'Tumbuh bersama', 'description' => 'Kami terus merapikan proses dan memperluas jangkauan tanpa kehilangan sentuhan manusia.', 'image' => 'https://images.unsplash.com/photo-1717457779749-7a6707d042ad?w=900&q=80&auto=format&fit=crop', 'image_alt' => 'Tim menyiapkan paket untuk melanjutkan perjalanan'],
+        ];
+        foreach ($milestones as $index => $milestone) {
+            Content::putItem('history', 'milestone_'.($index + 1), $milestone, $index + 1);
+        }
+
+        $photoIds = [
+            '1664382953403-fc1ac77073a0', '1573376670774-4427757f7963',
+            '1700727448575-6f1680cd7d75', '1766040923580-16ad32fae8b4',
+            '1601598704991-eef6114775e0', '1740914994657-f1cdffdc418e',
+            '1608822101624-23542c56db89', '1717457779749-7a6707d042ad',
+            '1736507748808-31bb64ce6fcc', '1601598505513-7489a6272d2a',
+            '1605745341112-85968b19335b', '1644079446600-219068676743',
+        ];
+        foreach ($photoIds as $index => $id) {
+            $photo = ['image' => "https://images.unsplash.com/photo-{$id}?w=900&h=1100&q=80&auto=format&fit=crop", 'alt' => 'Aktivitas manusia dan operasional di Anagata Warehouse'];
+            Content::putItem('collage_finale', 'photo_'.($index + 1), $photo, $index + 1);
+            if ($index < 4) {
+                Content::putItem('team_note', 'photo_'.($index + 1), $photo, $index + 1);
+            }
         }
     }
 
@@ -225,9 +325,8 @@ class CmsContentSeeder extends Seeder
             // warehouse's location instead of a separate footer-only copy.
             ['badge' => 'JKT', 'name' => 'Warehouse Jakarta', 'address' => 'Jl. Bojong Indah Raya No.4, Duren Sawit, Jakarta Timur 13450', 'area' => 'Duren Sawit, Jakarta Timur', 'region' => 'DKI Jakarta', 'lat' => -6.225, 'lng' => 106.900, 'status' => 'hub', 'hub_ref' => null, 'thumbnail' => 'https://images.unsplash.com/photo-1601598505513-7489a6272d2a?w=200&h=200&q=70&auto=format&fit=crop'],
             ['badge' => 'MKS', 'name' => 'Warehouse Makassar', 'address' => 'Jl. Cilallang Jaya VII No.17, Rappocini, Makassar 90222', 'area' => 'Rappocini, Makassar', 'region' => 'Sulawesi Selatan', 'lat' => -5.147, 'lng' => 119.432, 'status' => 'hub', 'hub_ref' => null, 'thumbnail' => 'https://images.unsplash.com/photo-1605745341112-85968b19335b?w=200&h=200&q=70&auto=format&fit=crop'],
-            ['badge' => 'MDN', 'name' => 'Warehouse Medan', 'address' => 'Medan, Sumatera Utara. Alamat detail menyusul.', 'area' => 'Medan, Sumatera Utara', 'region' => 'Sumatera Utara', 'lat' => 3.595, 'lng' => 98.672, 'status' => 'coming', 'hub_ref' => 'JKT', 'thumbnail' => null],
-            ['badge' => 'JOG', 'name' => 'Warehouse Yogyakarta', 'address' => 'Yogyakarta, DI Yogyakarta. Alamat detail menyusul.', 'area' => 'Yogyakarta, DI Yogyakarta', 'region' => 'DI Yogyakarta', 'lat' => -7.797, 'lng' => 110.370, 'status' => 'coming', 'hub_ref' => 'JKT', 'thumbnail' => null],
-            ['badge' => 'BJM', 'name' => 'Warehouse Banjarmasin', 'address' => 'Banjarmasin, Kalimantan Selatan. Segera hadir.', 'area' => 'Banjarmasin, Kalimantan Selatan', 'region' => 'Kalimantan Selatan', 'lat' => -3.319, 'lng' => 114.590, 'status' => 'coming', 'hub_ref' => 'MKS', 'thumbnail' => null],
+            ['badge' => 'SBY', 'name' => 'Warehouse Surabaya', 'address' => 'Perumahan kehakiman blok C no :7, Babat Jerawat, Kec. Pakal, Surabaya, Jawa Timur 60197', 'area' => 'Surabaya, Jawa Timur', 'region' => 'Jawa Timur', 'lat' => -7.245230, 'lng' => 112.627834, 'status' => 'listed', 'hub_ref' => null, 'thumbnail' => null],
+            ['badge' => 'JOG', 'name' => 'Warehouse Yogyakarta', 'address' => 'Jalan Margotirto UH V No.40/10 283 A, Pandeyan, Kec. Umbulharjo, Kota Yogyakarta, Daerah Istimewa Yogyakarta 55161', 'area' => 'Yogyakarta, DI Yogyakarta', 'region' => 'DI Yogyakarta', 'lat' => -7.822245, 'lng' => 110.393732, 'status' => 'listed', 'hub_ref' => null, 'thumbnail' => null],
         ];
         foreach ($cards as $i => $card) {
             Content::putItem('location', 'card_'.($i + 1), $card, $i + 1);

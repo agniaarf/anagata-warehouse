@@ -85,7 +85,9 @@ class AnalyticsCollector
                 [
                     'analytics_session_id' => $session->id,
                     'event_type' => $data['type'],
-                    'target' => $data['target'],
+                    // The original analytics schema predates target-less V2
+                    // funnel events and keeps this column non-nullable.
+                    'target' => $data['target'] ?? '',
                     'created_at' => $now,
                 ]
             );
@@ -94,13 +96,16 @@ class AnalyticsCollector
 
     private function validateTarget(string $type, ?string $target): void
     {
-        if ($type === 'session_start') {
+        if (in_array($type, config('analytics.events_without_target', ['session_start']), true)) {
             return;
         }
 
-        $allowed = $type === 'section_view'
-            ? config('analytics.sections', [])
-            : config('analytics.contact_channels', []);
+        $allowed = match ($type) {
+            'section_view' => config('analytics.sections', []),
+            'contact_click' => config('analytics.contact_channels', []),
+            'service_view' => config('analytics.services', []),
+            default => [],
+        };
 
         if (! $target || ! in_array($target, $allowed, true)) {
             throw ValidationException::withMessages(['target' => 'Aktivitas analytics tidak valid.']);
