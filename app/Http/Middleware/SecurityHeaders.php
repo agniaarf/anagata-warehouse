@@ -17,11 +17,14 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-        $response->headers->set('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'");
+        $response->headers->set('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'");
 
-        if (preg_match('/\Abojong(?:\/|$)/', $request->path())) {
+        if (preg_match('/\Abojong(?:\/|$)/', $request->path()) || $request->is('preview')) {
             $response->headers->set('Cache-Control', 'no-store, private');
             $response->headers->set('Pragma', 'no-cache');
+        }
+        if ($request->is('preview')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 
         if ($request->isSecure() && app()->environment('production')) {

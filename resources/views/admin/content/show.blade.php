@@ -12,15 +12,24 @@
         </div>
     </div>
 
-    <p class="admin-help">Pilih item untuk mengubah isinya. Atur posisi dengan ikon di samping item.</p>
+    <p class="admin-help">{{ $locked ? 'Pilih item untuk mengubah isinya. Posisi item mengikuti desain halaman.' : 'Pilih item untuk mengubah isinya. Atur posisi dengan ikon di samping item.' }}</p>
 
     <div class="admin-card">
         @forelse($items as $i => $item)
             @php
                 $title = $titleKey ? ($item['value'][$titleKey] ?: 'Item '.($i + 1)) : 'Item '.($i + 1);
                 $thumb = $imageKey ? \App\Support\Cms::imageUrl($item['value'][$imageKey] ?? '') : null;
+                $sectionFields = [
+                    'section_1' => ['headline', 'body_1', 'body_2', 'body_3', 'image'],
+                    'section_2' => ['headline', 'body_1', 'body_2', 'body_3', 'image'],
+                    'section_3' => ['headline', 'body_1', 'body_2', 'image'],
+                    'section_4' => ['headline', 'body_1', 'image', 'youtube_id', 'credit'],
+                    'section_5' => ['headline', 'body_1', 'image'],
+                    'section_6' => ['headline', 'body_1', 'body_2'],
+                ];
+                $visibleFields = $section === 'anagata_site' && $group === 'section' ? ($sectionFields[$item['key']] ?? null) : null;
             @endphp
-            <div class="content-item-row">
+            <div class="content-item-row {{ $locked ? 'content-item-row--locked' : '' }}">
                 <details class="content-list-item">
                     <summary>
                         @if($imageKey)
@@ -45,8 +54,19 @@
                             @method('PUT')
                             <div class="fields-grid">
                                 @foreach($repeaterDef['fields'] as $fkey => $fdef)
-                                    @php $display = cms_display_value($fdef['type'], $item['value'][$fkey] ?? ''); @endphp
-                                    @include('admin.partials.field', ['name' => $fkey, 'def' => $fdef, 'value' => $display, 'id' => 'item-'.$item['key'].'-'.$fkey])
+                                    @php
+                                        $display = cms_display_value($fdef['type'], $item['value'][$fkey] ?? '');
+                                        if ($visibleFields !== null && $item['key'] === 'section_6') {
+                                            if ($fkey === 'headline') { $fdef['label'] = 'Nama utama'; unset($fdef['hint']); }
+                                            if ($fkey === 'body_1') $fdef['label'] = 'Nama kedua';
+                                            if ($fkey === 'body_2') $fdef['label'] = 'Teks tombol';
+                                        }
+                                    @endphp
+                                    @if($visibleFields !== null && !in_array($fkey, $visibleFields, true))
+                                        <input type="hidden" name="{{ $fkey }}" value="{{ $display }}">
+                                    @else
+                                        @include('admin.partials.field', ['name' => $fkey, 'def' => $fdef, 'value' => $display, 'id' => 'item-'.$item['key'].'-'.$fkey])
+                                    @endif
                                 @endforeach
                             </div>
                             <div class="form-actions">
@@ -56,12 +76,14 @@
                     </div>
                 </details>
 
+                @unless($locked)
                 @include('admin.partials.order-controls', [
                     'up' => $i > 0 ? route('admin.content.items.move', [$section, $group, $item['key'], 'up']) : null,
                     'down' => $i < count($items) - 1 ? route('admin.content.items.move', [$section, $group, $item['key'], 'down']) : null,
                     'subject' => 'item',
                     'class' => 'content-order-controls',
                 ])
+                @endunless
             </div>
         @empty
             <p class="empty-state">Belum ada konten di daftar ini.</p>

@@ -46,6 +46,31 @@ class CmsNavigationTest extends TestCase
             ->assertSee('Inbound & Penerimaan Barang');
     }
 
+    public function test_editor_prioritizes_current_content_and_hides_irrelevant_section_fields(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('admin.content.index'))->assertOk()
+            ->assertSee('Kolase foto &amp; video', false)
+            ->assertSee('SEO &amp; Google', false)
+            ->assertSee('Konten versi sebelumnya')
+            ->assertDontSee('Konten desain baru');
+
+        $this->get(route('admin.content.show', ['anagata_site', 'section']))->assertOk()
+            ->assertSee('Nama utama')->assertSee('Nama kedua')->assertSee('Teks tombol');
+    }
+
+    public function test_seo_settings_are_visible_and_update_the_public_page(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('admin.settings.show', 'seo'))->assertOk()->assertSee('Pencarian Google');
+        $this->put(route('admin.settings.update', 'seo'), [
+            'meta_title' => 'Judul SEO Uji', 'meta_description' => 'Deskripsi SEO Uji',
+            'meta_keywords' => 'gudang', 'og_title' => 'Judul Berbagi',
+            'og_description' => 'Deskripsi Berbagi', 'image_alt_suffix' => '',
+        ])->assertSessionHasNoErrors();
+        $this->get('/')->assertOk()->assertSee('Judul SEO Uji')->assertSee('Deskripsi SEO Uji');
+    }
+
     public function test_content_items_have_icon_order_controls_outside_the_edit_panel(): void
     {
         $this->seed(CmsContentSeeder::class);

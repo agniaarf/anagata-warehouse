@@ -8,8 +8,8 @@
 
         <title>Pengelola situs | Anagata Warehouse</title>
 
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
     </head>
     <body>
         <div class="admin-shell">
@@ -17,6 +17,7 @@
 
             <main class="admin-main">
                 <div class="admin-main-inner">
+                    <div class="admin-topbar"><div><span class="admin-topbar-mark">AW</span><span>ANAGATA <i>/</i> PENGELOLA WEBSITE</span></div><a href="{{ route('landing.preview') }}" target="_blank" rel="noopener noreferrer">LIHAT PREVIEW <span aria-hidden="true">↗</span></a></div>
                     @if (session('status'))
                         <div class="field-status">{{ session('status') }}</div>
                     @endif

@@ -18,7 +18,15 @@ class Cms
             return '';
         }
 
-        return Str::startsWith($path, ['http://', 'https://'])
+        // Older seeders stored absolute localhost URLs for bundled assets.
+        // Resolve only these known local files against the current site origin.
+        $parts = parse_url($path);
+        if (is_array($parts) && in_array(strtolower($parts['host'] ?? ''), ['localhost', '127.0.0.1'], true)
+            && in_array($parts['path'] ?? '', ['/images/logo-light.png', '/images/logo-dark.png', '/images/favicon.png'], true)) {
+            return $parts['path'];
+        }
+
+        return Str::startsWith($path, ['http://', 'https://', '/'])
             ? $path
             : Storage::disk('public')->url($path);
     }

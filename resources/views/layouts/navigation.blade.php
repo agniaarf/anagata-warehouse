@@ -18,7 +18,11 @@
       Analitik
     </a>
 
-    <a href="{{ route('admin.settings.show', 'branding') }}" class="admin-side-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.settings.show', 'seo') }}" class="admin-side-link {{ request()->routeIs('admin.settings.*') && request()->route('tab') === 'seo' ? 'active' : '' }}">
+      SEO &amp; Google
+    </a>
+
+    <a href="{{ route('admin.settings.show', 'branding') }}" class="admin-side-link {{ request()->routeIs('admin.settings.*') && request()->route('tab') !== 'seo' ? 'active' : '' }}">
       Pengaturan
     </a>
   </nav>

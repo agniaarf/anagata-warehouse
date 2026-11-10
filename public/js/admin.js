@@ -75,9 +75,53 @@ function uploadImage(file, input) {
     });
 }
 
+function uploadVideo(file, input) {
+  if (!file) return;
+
+  const extension = file.name.split('.').pop().toLowerCase();
+  const allowedExtensions = ['webm', 'mp4'];
+  if (!allowedExtensions.includes(extension)) {
+    adminToast('Pilih video WebM atau MP4.', 'error');
+    input.value = '';
+    return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    adminToast('Ukuran video maksimal 20 MB.', 'error');
+    input.value = '';
+    return;
+  }
+
+  const targetInput = document.getElementById(input.dataset.target);
+  const preview = document.getElementById(input.dataset.preview);
+  const dropzone = document.getElementById(input.dataset.dropzone);
+  const csrf = document.querySelector('meta[name="csrf-token"]').content;
+  const formData = new FormData();
+  formData.append('video', file);
+  formData.append('folder', 'intro');
+
+  dropzone.classList.add('is-uploading');
+  fetch('/bojong/uploads', {
+    method: 'POST',
+    headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error('Upload failed');
+      return response.json();
+    })
+    .then((data) => {
+      targetInput.value = data.path;
+      preview.src = data.url;
+      preview.classList.remove('is-empty');
+      preview.load();
+    })
+    .catch(() => adminToast('Video gagal diunggah. Gunakan WebM/MP4 maksimal 20 MB.', 'error'))
+    .finally(() => dropzone.classList.remove('is-uploading'));
+}
+
 document.addEventListener('change', function (e) {
-  if (!e.target.classList.contains('js-image-upload')) return;
-  uploadImage(e.target.files[0], e.target);
+  if (e.target.classList.contains('js-image-upload')) uploadImage(e.target.files[0], e.target);
+  if (e.target.classList.contains('js-video-upload')) uploadVideo(e.target.files[0], e.target);
 });
 
 // Mobile sidebar toggle
@@ -195,6 +239,8 @@ document.querySelectorAll('.dropzone').forEach(function (dropzone) {
 
   dropzone.addEventListener('drop', (e) => {
     const file = e.dataTransfer.files[0];
-    if (file) uploadImage(file, input);
+    if (!file) return;
+    if (input.classList.contains('js-video-upload')) uploadVideo(file, input);
+    else uploadImage(file, input);
   });
 });

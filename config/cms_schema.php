@@ -3,6 +3,183 @@
 // Labels and field types used by the content editor.
 
 return [
+    'anagata_site' => [
+        'label' => 'Website',
+        'fields' => [],
+        'repeaters' => [
+            'story' => ['label' => 'Cerita pembuka', 'locked' => true, 'fields' => [
+                'name' => ['type' => 'text', 'label' => 'Penanda item'],
+                'label' => ['type' => 'text', 'label' => 'Judul kecil'],
+                'text' => ['type' => 'textarea', 'label' => 'Cerita'],
+                'image' => ['type' => 'image', 'label' => 'Foto'],
+                'position' => ['type' => 'select', 'label' => 'Posisi teks', 'options' => ['left' => 'Kiri', 'right' => 'Kanan', 'center' => 'Tengah']],
+            ]],
+            'service' => ['label' => 'Lima layanan', 'locked' => true, 'fields' => [
+                'name' => ['type' => 'text', 'label' => 'Nama layanan'],
+                'subtitle' => ['type' => 'text', 'label' => 'Ringkasan'],
+                'body' => ['type' => 'textarea', 'label' => 'Penjelasan'],
+                'narrative' => ['type' => 'textarea', 'label' => 'Cerita proses'],
+                'outcome' => ['type' => 'textarea', 'label' => 'Manfaat untuk seller'],
+                'steps' => ['type' => 'delimited_list', 'label' => 'Tahapan', 'hint' => 'Satu baris per tahap: Judul | Penjelasan'],
+                'image' => ['type' => 'image', 'label' => 'Foto layanan'],
+            ]],
+            'activity' => ['label' => 'People, Process, Purpose', 'locked' => true, 'fields' => [
+                'name' => ['type' => 'text', 'label' => 'Judul'],
+                'tagline' => ['type' => 'text', 'label' => 'Kalimat utama'],
+                'body' => ['type' => 'textarea', 'label' => 'Cerita'],
+                'image' => ['type' => 'image', 'label' => 'Foto'],
+            ]],
+            'photo' => ['label' => 'Kolase foto & video', 'locked' => true, 'fields' => [
+                'name' => ['type' => 'text', 'label' => 'Keterangan foto'],
+                'image' => ['type' => 'image', 'label' => 'Foto atau sampul video'],
+                'youtube_id' => ['type' => 'text', 'label' => 'Link atau ID YouTube (opsional)', 'hint' => 'Tempel link YouTube atau ID video jika slot ini ingin menjadi video. Kosongkan untuk foto.'],
+            ]],
+            'section' => ['label' => 'Teks dan video', 'locked' => true, 'fields' => [
+                'name' => ['type' => 'text', 'label' => 'Nama bagian'],
+                'headline' => ['type' => 'text', 'label' => 'Judul', 'hint' => 'Tambahkan | sebelum bagian judul yang ingin diberi warna violet.'],
+                'body_1' => ['type' => 'textarea', 'label' => 'Paragraf pertama'],
+                'body_2' => ['type' => 'textarea', 'label' => 'Paragraf kedua'],
+                'body_3' => ['type' => 'textarea', 'label' => 'Paragraf ketiga'],
+                'image' => ['type' => 'image', 'label' => 'Foto'],
+                'youtube_id' => ['type' => 'text', 'label' => 'Link atau ID video YouTube', 'hint' => 'Tempel link YouTube atau ID video, misalnya TprgJuLRPFY.'],
+                'credit' => ['type' => 'text', 'label' => 'Keterangan sumber video'],
+            ]],
+        ],
+    ],
+    'intro' => [
+        'label' => 'Opening Anagata',
+        'fields' => [
+            'brand' => ['type' => 'text', 'label' => 'Wordmark utama', 'required' => true],
+            'subbrand' => ['type' => 'text', 'label' => 'Wordmark kedua', 'required' => true],
+            'hashtag' => ['type' => 'text', 'label' => 'Hashtag'],
+            'cta_label' => ['type' => 'text', 'label' => 'Teks tombol', 'required' => true],
+            'poster_image' => ['type' => 'image', 'label' => 'Poster opening', 'required' => true],
+            'video_webm' => ['type' => 'video', 'label' => 'Video WebM', 'hint' => 'Disarankan untuk browser modern. Maks. 20 MB.', 'required' => false],
+            'video_mp4' => ['type' => 'video', 'label' => 'Video MP4 fallback', 'hint' => 'Fallback untuk browser yang tidak mendukung WebM. Maks. 20 MB.', 'required' => false],
+            'overlay_opacity' => ['type' => 'number', 'label' => 'Overlay gelap (0-100)', 'step' => '1'],
+            'playback_rate' => ['type' => 'number', 'label' => 'Kecepatan video', 'step' => '0.1', 'hint' => 'Gunakan 0.6 untuk gerak sinematik pelan.'],
+            'show_once' => ['type' => 'checkbox', 'label' => 'Tampilkan sekali per browser session'],
+        ],
+        'repeaters' => [],
+    ],
+
+    'meaning' => [
+        'label' => 'Arti Anagata',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Cerita'],
+            'image' => ['type' => 'image', 'label' => 'Foto manusia/aktivitas'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto untuk pembaca layar'],
+            'image_position' => ['type' => 'select', 'label' => 'Fokus foto', 'options' => ['center' => 'Tengah', 'left' => 'Kiri', 'right' => 'Kanan']],
+            'overlay_opacity' => ['type' => 'number', 'label' => 'Overlay violet (0-100)', 'step' => '1'],
+        ],
+        'repeaters' => [],
+    ],
+
+    'history' => [
+        'label' => 'Sejarah Anagata',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Pengantar'],
+            'image' => ['type' => 'image', 'label' => 'Foto utama'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto untuk pembaca layar'],
+            'image_position' => ['type' => 'select', 'label' => 'Fokus foto', 'options' => ['center' => 'Tengah', 'left' => 'Kiri', 'right' => 'Kanan']],
+            'overlay_opacity' => ['type' => 'number', 'label' => 'Overlay violet (0-100)', 'step' => '1'],
+        ],
+        'repeaters' => [
+            'milestone' => [
+                'label' => 'Milestone sejarah',
+                'add_label' => 'Tambah milestone',
+                'fields' => [
+                    'year' => ['type' => 'text', 'label' => 'Tahun/periode'],
+                    'title' => ['type' => 'text', 'label' => 'Judul'],
+                    'description' => ['type' => 'textarea', 'label' => 'Cerita singkat'],
+                    'image' => ['type' => 'image', 'label' => 'Foto'],
+                    'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+                ],
+            ],
+        ],
+    ],
+
+    'team_note' => [
+        'label' => 'Sekapur Sirih',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Pesan tim'],
+            'signature' => ['type' => 'text', 'label' => 'Penanda tangan'],
+            'image' => ['type' => 'image', 'label' => 'Foto tim'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto untuk pembaca layar'],
+            'image_position' => ['type' => 'select', 'label' => 'Fokus foto', 'options' => ['center' => 'Tengah', 'left' => 'Kiri', 'right' => 'Kanan']],
+            'overlay_opacity' => ['type' => 'number', 'label' => 'Overlay violet (0-100)', 'step' => '1'],
+        ],
+        'repeaters' => [
+            'photo' => [
+                'label' => 'Potongan collage chapter', 'add_label' => 'Tambah foto',
+                'fields' => [
+                    'image' => ['type' => 'image', 'label' => 'Foto'],
+                    'alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+                ],
+            ],
+        ],
+    ],
+
+    'collage_finale' => [
+        'label' => 'Collage Finale',
+        'fields' => [
+            'headline' => ['type' => 'textarea', 'label' => 'Kalimat utama'],
+            'hashtag' => ['type' => 'text', 'label' => 'Hashtag'],
+        ],
+        'repeaters' => [
+            'photo' => [
+                'label' => 'Foto collage finale', 'add_label' => 'Tambah foto',
+                'fields' => [
+                    'image' => ['type' => 'image', 'label' => 'Foto'],
+                    'alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+                ],
+            ],
+        ],
+    ],
+
+    'inbound' => [
+        'label' => 'Inbound',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Cerita layanan'],
+            'image' => ['type' => 'image', 'label' => 'Foto aktivitas'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+            'steps' => ['type' => 'list', 'label' => 'Tahapan singkat', 'hint' => 'Satu tahap per baris.'],
+            'cta_label' => ['type' => 'text', 'label' => 'Teks CTA', 'required' => false],
+        ], 'repeaters' => [],
+    ],
+    'outbound' => [
+        'label' => 'Outbound',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Cerita layanan'],
+            'image' => ['type' => 'image', 'label' => 'Foto aktivitas'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+            'steps' => ['type' => 'list', 'label' => 'Tahapan singkat', 'hint' => 'Satu tahap per baris.'],
+            'cta_label' => ['type' => 'text', 'label' => 'Teks CTA', 'required' => false],
+        ], 'repeaters' => [],
+    ],
+    'return' => [
+        'label' => 'Return',
+        'fields' => [
+            'eyebrow' => ['type' => 'text', 'label' => 'Teks kecil'],
+            'headline' => ['type' => 'textarea', 'label' => 'Judul'],
+            'body' => ['type' => 'textarea', 'label' => 'Cerita layanan'],
+            'image' => ['type' => 'image', 'label' => 'Foto aktivitas'],
+            'image_alt' => ['type' => 'text', 'label' => 'Deskripsi foto'],
+            'steps' => ['type' => 'list', 'label' => 'Tahapan singkat', 'hint' => 'Satu tahap per baris.'],
+            'cta_label' => ['type' => 'text', 'label' => 'Teks CTA', 'required' => false],
+        ], 'repeaters' => [],
+    ],
+
     'hero' => [
         'label' => 'Banner utama',
         'fields' => [
@@ -144,7 +321,7 @@ return [
                     'region' => ['type' => 'text', 'label' => 'Provinsi'],
                     'lat' => ['type' => 'number', 'label' => 'Latitude peta', 'step' => 'any', 'hint' => 'Koordinat titik pada peta.'],
                     'lng' => ['type' => 'number', 'label' => 'Longitude peta', 'step' => 'any', 'hint' => 'Koordinat titik pada peta.'],
-                    'status' => ['type' => 'select', 'label' => 'Status', 'options' => ['hub' => 'Gudang aktif', 'coming' => 'Segera hadir']],
+                    'status' => ['type' => 'select', 'label' => 'Status', 'options' => ['hub' => 'Gudang aktif', 'listed' => 'Tercantum (status belum dikonfirmasi)', 'coming' => 'Segera hadir', 'hidden' => 'Tidak ditampilkan']],
                     'hub_ref' => ['type' => 'text', 'label' => 'Kode gudang aktif terdekat', 'hint' => 'Isi untuk lokasi yang berstatus Segera hadir.'],
                     'thumbnail' => ['type' => 'image', 'label' => 'Foto lokasi', 'required' => false],
                 ],

@@ -5,6 +5,7 @@ use App\Http\Controllers\AnalyticsCollectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/preview', [PageController::class, 'preview'])->middleware('auth')->name('landing.preview');
 Route::post('/analytics/collect', AnalyticsCollectionController::class)
     ->middleware('throttle:60,1')
     ->name('analytics.collect');

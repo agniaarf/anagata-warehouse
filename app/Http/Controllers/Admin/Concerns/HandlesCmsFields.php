@@ -57,10 +57,10 @@ trait HandlesCmsFields
             } elseif ($type === 'color') {
                 $fieldRules[] = 'string';
                 $fieldRules[] = 'regex:/\A#[0-9a-fA-F]{6}\z/';
-            } elseif ($type === 'image') {
+            } elseif ($type === 'image' || $type === 'video') {
                 $fieldRules[] = 'string';
                 $fieldRules[] = 'max:2048';
-                $fieldRules[] = function ($attribute, $value, $fail): void {
+                $fieldRules[] = function ($attribute, $value, $fail) use ($type): void {
                     if ($value === null || $value === '') {
                         return;
                     }
@@ -71,10 +71,15 @@ trait HandlesCmsFields
                     $isValidUrl = filter_var($value, FILTER_VALIDATE_URL) !== false;
                     $remoteImage = ($scheme === 'https' || (app()->environment(['local', 'testing']) && $scheme === 'http' && $host === $appHost))
                         && $host !== '' && $isValidUrl;
-                    $storedImage = preg_match('#\A(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.(?:jpe?g|png|webp|gif|svg)\z#i', $value) === 1;
+                    $extensions = $type === 'video' ? 'mp4|webm' : 'jpe?g|png|webp|gif|svg';
+                    $storedMedia = preg_match('#\A(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.(?:'.$extensions.')\z#i', $value) === 1;
+                    $publicAsset = $type === 'image'
+                        && preg_match('#\A/(?:images|partner-logos|anagata-images)/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.(?:'.$extensions.')\z#i', $value) === 1;
 
-                    if (! $remoteImage && ! $storedImage) {
-                        $fail('Referensi gambar harus berupa URL HTTPS atau path gambar yang valid.');
+                    if (! $remoteImage && ! $storedMedia && ! $publicAsset) {
+                        $fail($type === 'video'
+                            ? 'Referensi video harus berupa URL HTTPS atau path MP4/WebM yang valid.'
+                            : 'Referensi gambar harus berupa URL HTTPS atau path gambar yang valid.');
                     }
                 };
             } elseif ($type === 'list' || $type === 'delimited_list') {
@@ -118,7 +123,13 @@ trait HandlesCmsFields
                     };
                 }
 
-                if ($key === 'email') {
+                if ($key === 'youtube_id') {
+                    $fieldRules[] = function ($attribute, $value, $fail): void {
+                        if ($value !== null && $value !== '' && $this->youtubeId((string) $value) === null) {
+                            $fail('Masukkan link YouTube atau ID video yang valid.');
+                        }
+                    };
+                } elseif ($key === 'email') {
                     $fieldRules[] = 'email:rfc';
                 } elseif ($key === 'whatsapp_number') {
                     $fieldRules[] = 'regex:/\A[1-9][0-9]{7,15}\z/';
@@ -135,6 +146,9 @@ trait HandlesCmsFields
 
     protected function encodeFieldValue(string $type, Request $request, string $key): string
     {
+        if ($key === 'youtube_id') {
+            return $this->youtubeId((string) $request->input($key, '')) ?? '';
+        }
         return match ($type) {
             'checkbox' => $request->boolean($key) ? '1' : '0',
             'list' => json_encode(FieldCodec::listToArray((string) $request->input($key, '')), JSON_UNESCAPED_UNICODE),
@@ -147,6 +161,10 @@ trait HandlesCmsFields
     {
         $fields = [];
         foreach ($repeaterDef['fields'] as $key => $def) {
+            if ($key === 'youtube_id') {
+                $fields[$key] = $this->youtubeId((string) $request->input($key, '')) ?? '';
+                continue;
+            }
             $fields[$key] = match ($def['type']) {
                 'checkbox' => $request->boolean($key),
                 'list' => FieldCodec::listToArray((string) $request->input($key, '')),
@@ -156,5 +174,27 @@ trait HandlesCmsFields
         }
 
         return $fields;
+    }
+
+    private function youtubeId(string $value): ?string
+    {
+        $value = trim($value);
+        if (preg_match('/\A[A-Za-z0-9_-]{11}\z/', $value)) return $value;
+        $parts = parse_url($value);
+        if (! is_array($parts) || strtolower($parts['scheme'] ?? '') !== 'https') return null;
+        $host = strtolower($parts['host'] ?? '');
+        $path = $parts['path'] ?? '';
+        $id = '';
+        if ($host === 'youtu.be') {
+            $id = ltrim($path, '/');
+        } elseif (in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'www.youtube-nocookie.com'], true)) {
+            if ($path === '/watch') {
+                parse_str($parts['query'] ?? '', $query);
+                $id = is_string($query['v'] ?? null) ? $query['v'] : '';
+            } elseif (preg_match('#\A/(?:embed|shorts)/([A-Za-z0-9_-]{11})/?\z#', $path, $match)) {
+                $id = $match[1];
+            }
+        }
+        return preg_match('/\A[A-Za-z0-9_-]{11}\z/', $id) ? $id : null;
     }
 }

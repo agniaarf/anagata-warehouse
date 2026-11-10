@@ -74,6 +74,23 @@ class AnalyticsCollectionTest extends TestCase
         $this->postJson(route('analytics.collect'), $this->payload($visitorId, $sessionId, 'section_view', 'not-a-section'))
             ->assertUnprocessable()
             ->assertJsonValidationErrors('target');
+
+        $this->postJson(route('analytics.collect'), $this->payload($visitorId, $sessionId, 'service_view', 'inventory'))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('target');
+    }
+
+    public function test_v2_journey_and_service_events_are_collected(): void
+    {
+        $visitorId = (string) Str::uuid();
+        $sessionId = (string) Str::uuid();
+        $this->postJson(route('analytics.collect'), $this->payload($visitorId, $sessionId, 'session_start'))->assertNoContent();
+
+        $this->postJson(route('analytics.collect'), $this->payload($visitorId, $sessionId, 'journey_start'))->assertNoContent();
+        $this->postJson(route('analytics.collect'), $this->payload($visitorId, $sessionId, 'service_view', 'outbound'))->assertNoContent();
+
+        $this->assertDatabaseHas('analytics_events', ['event_type' => 'journey_start', 'target' => '']);
+        $this->assertDatabaseHas('analytics_events', ['event_type' => 'service_view', 'target' => 'outbound']);
     }
 
     public function test_non_scalar_event_fields_are_rejected_as_validation_errors(): void
@@ -104,6 +121,7 @@ class AnalyticsCollectionTest extends TestCase
 
     public function test_landing_page_configures_tracking_for_visitors_but_disables_it_for_admins(): void
     {
+        config(['landing.anagata_enabled' => false]); // This assertion covers the server-rendered legacy landing.
         $this->seed(CmsContentSeeder::class);
 
         $this->get('/')
@@ -112,7 +130,8 @@ class AnalyticsCollectionTest extends TestCase
             ->assertSee('data-analytics-endpoint="/analytics/collect"', false)
             ->assertSee('data-analytics-session-timeout="30"', false)
             ->assertSee('data-analytics-visitor-days="90"', false)
-            ->assertSee('data-analytics-section="hero"', false)
+            ->assertSee('data-analytics-section="intro"', false)
+            ->assertSee('data-journey-start', false)
             ->assertSee('data-analytics-contact="whatsapp"', false)
             ->assertSee('analytics-disclosure');
 

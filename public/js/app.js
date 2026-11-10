@@ -1,6 +1,7 @@
 // nav blur-on-scroll — transparent over the hero, solid+blurred once scrolled
 (function(){
   const navEl = document.querySelector('nav');
+  if(!navEl) return;
   function syncNavScroll(){
     navEl.classList.toggle('is-scrolled', window.scrollY > 40);
   }
@@ -9,11 +10,17 @@
 })();
 
 // mobile nav toggle
-document.getElementById('navToggle').addEventListener('click', ()=>{
-  document.getElementById('navMobile').classList.toggle('open');
+const navToggle = document.getElementById('navToggle');
+const navMobile = document.getElementById('navMobile');
+if(navToggle && navMobile) navToggle.addEventListener('click', ()=>{
+  const open = navMobile.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', String(open));
 });
 document.querySelectorAll('#navMobile a').forEach(a=>{
-  a.addEventListener('click', ()=>document.getElementById('navMobile').classList.remove('open'));
+  a.addEventListener('click', ()=>{
+    navMobile?.classList.remove('open');
+    navToggle?.setAttribute('aria-expanded', 'false');
+  });
 });
 
 // First-party, anonymous visitor analytics. A tab is one session unless it has
@@ -177,11 +184,100 @@ document.querySelectorAll('#navMobile a').forEach(a=>{
   document.querySelectorAll('[data-analytics-contact]').forEach(link=>{
     link.addEventListener('click', ()=>record('contact_click', link.dataset.analyticsContact));
   });
+
+  document.querySelector('[data-journey-start]')?.addEventListener('click', ()=>record('journey_start'));
+
+  const seenFunnelEvents = new Set();
+  function trackFunnel(target){
+    const type = target.dataset.funnelEvent;
+    const eventTarget = target.dataset.funnelTarget || null;
+    const key = `${type}:${eventTarget || ''}`;
+    if(!type || seenFunnelEvents.has(key)) return;
+    seenFunnelEvents.add(key);
+    record(type, eventTarget);
+    if(target.hasAttribute('data-main-entry')) record('main_site_enter');
+  }
+  const funnelTargets = document.querySelectorAll('[data-funnel-event]');
+  if('IntersectionObserver' in window){
+    const funnelObserver = new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting) trackFunnel(entry.target);
+    }), {threshold:0.25});
+    funnelTargets.forEach(target=>funnelObserver.observe(target));
+  } else {
+    funnelTargets.forEach(trackFunnel);
+  }
+})();
+
+// Opening journey: one cinematic gate per browser session, unless a direct
+// hash link intentionally targets a later section.
+(function(){
+  const intro = document.getElementById('intro');
+  if(!intro) return;
+  const root = document.documentElement;
+  const button = intro.querySelector('[data-journey-start]');
+  const video = intro.querySelector('video');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const storageKey = 'anagata.journey.completed.v2';
+  const showOnce = intro.dataset.introShowOnce !== '0';
+
+  if(!location.hash && !showOnce) root.classList.add('has-intro');
+  if(location.hash) root.classList.remove('has-intro');
+
+  if(video){
+    video.playbackRate = Number(video.dataset.playbackRate || .6);
+    if(reduceMotion) video.pause();
+    else video.play().catch(()=>{});
+  }
+
+  button?.addEventListener('click', event=>{
+    event.preventDefault();
+    if(showOnce){ try { sessionStorage.setItem(storageKey, '1'); } catch(_) {} }
+    intro.classList.add('is-opening');
+    const finish = ()=>{
+      root.classList.remove('has-intro');
+      intro.classList.remove('is-opening');
+      document.getElementById('journey-stories')?.scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth'});
+    };
+    window.setTimeout(finish, reduceMotion ? 220 : 920);
+  });
+})();
+
+// Text/photo reveals and the delayed main navigation use IntersectionObserver;
+// without it the content remains fully available.
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealItems = document.querySelectorAll('.reveal-on-scroll');
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealItems.forEach(item=>item.classList.add('is-visible'));
+  } else {
+    const revealObserver = new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    }), {threshold:.14, rootMargin:'0px 0px -8%'});
+    revealItems.forEach(item=>revealObserver.observe(item));
+  }
+
+  const mainEntry = document.querySelector('[data-main-entry]');
+  const mainHashes = new Set(['#working-activity','#services','#inventory','#pick-pack','#inbound','#outbound','#return','#location','#contact']);
+  if(mainHashes.has(location.hash)) document.body.classList.add('nav-ready');
+  if(mainEntry && 'IntersectionObserver' in window){
+    const navObserver = new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        document.body.classList.add('nav-ready');
+        navObserver.disconnect();
+      }
+    }), {threshold:.03});
+    navObserver.observe(mainEntry);
+  } else if(!mainEntry) {
+    document.body.classList.add('nav-ready');
+  }
 })();
 
 // marquee duplicate for seamless loop
 const mq = document.getElementById('marquee');
-mq.innerHTML += mq.innerHTML;
+if(mq) mq.innerHTML += mq.innerHTML;
 
 // Set browser-native lazy loading and a shared loading placeholder for every
 // content image. The nav logo stays eager because it is visible immediately.
@@ -417,6 +513,7 @@ mq.innerHTML += mq.innerHTML;
   // the edges on narrow/short mobile map containers
   const INDONESIA_BOUNDS = [[-11.5, 94.5], [7, 141.5]];
 
+  if (!document.getElementById('locMap') || typeof L === 'undefined') return;
   const map = L.map('locMap', {zoomControl:false, attributionControl:false, scrollWheelZoom:false, dragging:!L.Browser.mobile});
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom:16}).addTo(map);
 
@@ -571,4 +668,85 @@ mq.innerHTML += mq.innerHTML;
     }, {threshold:0.6});
     counters.forEach(el => io.observe(el));
   }
+})();
+
+// The activity hub keeps the three themes available for hover, touch and keyboard.
+(function(){
+  const hub = document.getElementById('working-activity');
+  if(!hub) return;
+  const main = hub.querySelector('[data-explore-main]');
+  const activity = hub.querySelector('[data-explore-activity]');
+  const title = hub.querySelector('[data-explore-title]');
+  const description = hub.querySelector('[data-explore-description]');
+  function select(card){
+    title.textContent = card.dataset.title;
+    description.textContent = card.dataset.description;
+    if(card.tagName === 'BUTTON') activity.querySelectorAll('button').forEach(button=>button.setAttribute('aria-pressed', String(button === card)));
+  }
+  hub.querySelectorAll('.explore-card').forEach(card=>{
+    card.addEventListener('mouseenter', ()=>select(card));
+    card.addEventListener('focus', ()=>select(card));
+    if(card.tagName === 'BUTTON') card.addEventListener('click', ()=>select(card));
+  });
+  document.querySelectorAll('[data-hub-home]').forEach(link=>link.addEventListener('click', ()=>{
+    main.hidden = false; activity.hidden = true; select(main.querySelector('.explore-card'));
+  }));
+  document.querySelectorAll('[data-activity-nav]').forEach(link=>link.addEventListener('click', ()=>{
+    main.hidden = true; activity.hidden = false; select(activity.querySelector('button'));
+  }));
+  hub.querySelector('[data-open-activity]')?.addEventListener('click', event=>{
+    event.preventDefault(); main.hidden = true; activity.hidden = false; select(activity.querySelector('button'));
+  });
+})();
+
+// Accessible service tabs; direct links and the sticky navigation always land at the section start.
+(function(){
+  const section = document.querySelector('[data-service-experience]');
+  if(!section) return;
+  const tabs = [...section.querySelectorAll('[data-service-tab]')];
+  const panels = [...section.querySelectorAll('[data-service-panel]')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function select(slug, shouldScroll){
+    if(!tabs.some(tab=>tab.dataset.serviceTab === slug)) slug = 'inbound';
+    tabs.forEach(tab=>{const active = tab.dataset.serviceTab === slug; tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;});
+    panels.forEach(panel=>{ panel.hidden = panel.dataset.servicePanel !== slug; });
+    if(shouldScroll) requestAnimationFrame(()=>window.scrollTo({top:section.getBoundingClientRect().top + window.scrollY - 80, behavior:reduced ? 'auto' : 'smooth'}));
+  }
+  tabs.forEach((tab,index)=>{
+    tab.addEventListener('click', ()=>select(tab.dataset.serviceTab, false));
+    tab.addEventListener('keydown', event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      let next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[next].focus(); select(tabs[next].dataset.serviceTab, false);
+    });
+  });
+  document.querySelectorAll('[data-services-nav]').forEach(link=>link.addEventListener('click', event=>{event.preventDefault(); select('inbound', true);}));
+  function applyHash(){ const slug = location.hash.slice(1); if(tabs.some(tab=>tab.dataset.serviceTab === slug)) select(slug, true); }
+  select(location.hash.slice(1), false);
+  if(tabs.some(tab=>tab.dataset.serviceTab === location.hash.slice(1))) requestAnimationFrame(applyHash);
+  window.addEventListener('hashchange', applyHash);
+})();
+
+// The reference uses one exploration area: Activity, Services and Locations replace one another.
+(function(){
+  const hub = document.getElementById('working-activity');
+  const services = document.getElementById('services');
+  const location = document.getElementById('location');
+  if(!hub || !services || !location) return;
+  function show(which){
+    hub.hidden = which !== 'hub'; services.hidden = which !== 'services'; location.hidden = which !== 'location';
+  }
+  const hash = window.location.hash;
+  const serviceHashes = ['#services','#inbound','#inventory','#pick-pack','#outbound','#return'];
+  show(serviceHashes.includes(hash) ? 'services' : hash === '#location' ? 'location' : 'hub');
+  document.querySelectorAll('[data-hub-home], [data-activity-nav]').forEach(link=>link.addEventListener('click', ()=>show('hub')));
+  document.querySelectorAll('a[href="#services"]').forEach(link=>link.addEventListener('click', ()=>show('services')));
+  document.querySelectorAll('a[href="#location"]').forEach(link=>link.addEventListener('click', ()=>show('location')));
+  window.addEventListener('hashchange', ()=>{
+    if(serviceHashes.includes(locationHash())) show('services');
+    else if(locationHash() === '#location') show('location');
+    else if(locationHash() === '#working-activity') show('hub');
+  });
+  function locationHash(){return window.location.hash;}
 })();

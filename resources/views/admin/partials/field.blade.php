@@ -39,6 +39,10 @@
                 @include('admin.partials.field-image', ['name' => $name, 'value' => $value, 'id' => $id])
                 @break
 
+            @case('video')
+                @include('admin.partials.field-video', ['name' => $name, 'value' => $value, 'id' => $id])
+                @break
+
             @default
                 <input type="text" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}" class="field-input">
         @endswitch

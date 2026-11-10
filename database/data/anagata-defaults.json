@@ -1,0 +1,367 @@
+{
+  "story": [
+    {
+      "name": "Chapter 1",
+      "label": "A beginning",
+      "text": "Setiap bisnis dimulai dari sebuah mimpi. Anagata hadir untuk menjaga mimpi itu tetap bergerak.",
+      "image": "/anagata-images/operations.jpg",
+      "position": "left"
+    },
+    {
+      "name": "Chapter 2",
+      "label": "Room to grow",
+      "text": "Bertumbuh bukan hanya tentang menjual lebih banyak, tetapi tentang membangun proses yang mampu mengikuti setiap langkahmu.",
+      "image": "/anagata-images/inventory.jpg",
+      "position": "right"
+    },
+    {
+      "name": "Chapter 3",
+      "label": "Made by people",
+      "text": "Terinspirasi oleh manusia dan kerja keras, kami menyatukan ruang, sistem, dan perhatian dalam satu perjalanan.",
+      "image": "/anagata-images/packing.jpg",
+      "position": "left"
+    },
+    {
+      "name": "Chapter 4",
+      "label": "Future in motion",
+      "text": "Bayangkan operasional yang lebih ringan. Pelanggan yang lebih bahagia. Dan bisnismu melangkah lebih jauh.",
+      "image": "/anagata-images/warehouse-hero.jpg",
+      "position": "right"
+    },
+    {
+      "name": "Chapter 5",
+      "label": "The next chapter",
+      "text": "Apakah kamu siap tumbuh bersama kami?",
+      "image": "/anagata-images/hero.jpg",
+      "position": "center"
+    }
+  ],
+  "service": [
+    {
+      "name": "Inbound",
+      "subtitle": "Penerimaan dan pencatatan produk masuk.",
+      "body": "Setiap produk yang masuk dimonitor dari request seller, diterima dari seller atau supplier, diperiksa jumlah dan kondisinya, lalu dicatat ke sistem sebelum ditempatkan di lokasi penyimpanan.",
+      "narrative": "Proses inbound dimulai bahkan sebelum barang tiba. Tim memonitor request dari seller agar jadwal, jumlah, dan kebutuhan penempatan sudah dipahami sejak awal. Saat produk sampai, seluruh barang melewati pemeriksaan fisik dan pencocokan data sebelum dinyatakan siap masuk ke inventory.",
+      "outcome": "Seller mendapatkan catatan barang masuk yang lebih jelas, stok awal yang akurat, dan produk yang langsung tersusun pada lokasi penyimpanan yang tepat.",
+      "steps": [
+        {
+          "title": "Request Monitoring",
+          "description": "Request dari seller dimonitor dan divalidasi sebelum jadwal kedatangan barang."
+        },
+        {
+          "title": "Receiving",
+          "description": "Produk diterima dari seller atau supplier dan dicocokkan dengan informasi inbound."
+        },
+        {
+          "title": "Checking & Unboxing",
+          "description": "Jumlah, varian, dan kondisi fisik produk diperiksa saat proses unboxing."
+        },
+        {
+          "title": "Update Inbound Data",
+          "description": "Hasil pemeriksaan dicatat dan data stok masuk diperbarui di sistem."
+        },
+        {
+          "title": "Putaway",
+          "description": "Produk ditempatkan pada lokasi penyimpanan sesuai mapping seller dan SKU."
+        }
+      ],
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "Inventory",
+      "subtitle": "Penataan dan kontrol stok harian.",
+      "body": "Lokasi penyimpanan diatur berdasarkan seller dan SKU. Produk disimpan sesuai kapasitas serta kebutuhan inventory agar stok tetap rapi, aman, dan mudah dipantau.",
+      "narrative": "Inventory yang rapi bukan hanya tentang meletakkan barang di rak. Setiap seller dan SKU membutuhkan lokasi yang jelas agar produk mudah ditemukan, dihitung, dan diproses ketika order masuk. Penataan ini dikontrol setiap hari untuk menjaga konsistensi antara stok fisik dan data.",
+      "outcome": "Produk tersimpan secara terpisah dan terstruktur, proses picking menjadi lebih efisien, dan seller memiliki visibilitas stok yang lebih dapat diandalkan.",
+      "steps": [
+        {
+          "title": "Location Mapping",
+          "description": "Area penyimpanan dirancang berdasarkan kebutuhan setiap seller."
+        },
+        {
+          "title": "Seller & SKU Slotting",
+          "description": "Setiap SKU mendapat slot yang jelas untuk mengurangi risiko tertukar."
+        },
+        {
+          "title": "Storage",
+          "description": "Produk disimpan sesuai kapasitas, karakter, dan kebutuhan inventory."
+        },
+        {
+          "title": "Daily Control",
+          "description": "Kondisi lokasi dan pergerakan stok diperiksa secara berkala setiap hari."
+        }
+      ],
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "Pick & Pack",
+      "subtitle": "Verifikasi order sampai pengemasan.",
+      "body": "Produk diambil sesuai order, diverifikasi kembali berdasarkan SKU, varian, dan quantity, kemudian dikemas mengikuti SOP fulfillment sebelum masuk ke tahap sortir.",
+      "narrative": "Ketika order diterima, tim memproses data pesanan dan mengambil produk dari lokasi yang sudah dipetakan. Setiap item kembali diverifikasi sebelum dikemas agar SKU, varian, dan jumlah sesuai dengan pesanan pelanggan.",
+      "outcome": "Pesanan diproses dengan standar yang konsisten, risiko kesalahan produk berkurang, dan paket siap memasuki proses pengiriman pada hari yang sama.",
+      "steps": [
+        {
+          "title": "Order Processing",
+          "description": "Data order seller diterima dan disiapkan untuk proses operasional."
+        },
+        {
+          "title": "Picking",
+          "description": "Produk diambil dari lokasi penyimpanan sesuai daftar order."
+        },
+        {
+          "title": "QC Verification",
+          "description": "SKU, varian, quantity, dan kondisi produk diverifikasi kembali."
+        },
+        {
+          "title": "Packing",
+          "description": "Pesanan dikemas mengikuti SOP fulfillment dan kebutuhan brand."
+        },
+        {
+          "title": "Sorting",
+          "description": "Paket yang selesai dipisahkan berdasarkan layanan pengiriman dan 3PL."
+        }
+      ],
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "Outbound",
+      "subtitle": "Proses order sampai ke ekspedisi.",
+      "body": "Pesanan diproses, diverifikasi, dikemas, dan disortir berdasarkan layanan pengiriman sebelum diserahterimakan kepada mitra 3PL seperti JNE, J&T, SiCepat, SPX, dan AnterAja.",
+      "narrative": "Outbound menghubungkan operasional gudang dengan perjalanan terakhir paket menuju pelanggan. Setelah order selesai diproses, paket disortir berdasarkan ekspedisi dan layanan pengiriman agar serah terima kepada mitra 3PL berjalan teratur.",
+      "outcome": "Seller mendapatkan proses handover yang lebih tertib, status outbound yang diperbarui, dan paket yang siap bergerak melalui mitra pengiriman terpercaya.",
+      "steps": [
+        {
+          "title": "Order Processing",
+          "description": "Order outbound seller diterima dan masuk ke antrean pemrosesan."
+        },
+        {
+          "title": "QC",
+          "description": "Kesesuaian produk dan data pengiriman diverifikasi sebelum paket ditutup."
+        },
+        {
+          "title": "Picking & Packing",
+          "description": "Produk diambil, dikemas, dan dilabeli sesuai order."
+        },
+        {
+          "title": "Sorting",
+          "description": "Paket dikelompokkan berdasarkan layanan dan mitra ekspedisi."
+        },
+        {
+          "title": "3PL Handover",
+          "description": "Paket diserahterimakan kepada JNE, J&T, SiCepat, SPX, AnterAja, atau mitra terkait."
+        },
+        {
+          "title": "Status Update",
+          "description": "Data outbound dan status penyerahan diperbarui setelah handover."
+        }
+      ],
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "Return",
+      "subtitle": "Pengelolaan produk kembali.",
+      "body": "Paket return diterima dari 3PL, dibuka dan diperiksa kondisi serta isinya, kemudian data return diperbarui sebelum produk ditempatkan kembali ke inventory.",
+      "narrative": "Perjalanan paket tidak selalu selesai saat dikirim. Ketika return datang dari 3PL, tim menerima dan membuka kembali paket untuk memahami kondisi produk serta memastikan isi return sesuai dengan data yang tersedia.",
+      "outcome": "Produk return terdokumentasi dengan jelas, kondisi barang diketahui, dan item yang masih layak dapat dikembalikan ke inventory secara teratur.",
+      "steps": [
+        {
+          "title": "Return Receiving",
+          "description": "Paket return diterima dari pihak 3PL dan dicatat sebagai barang kembali."
+        },
+        {
+          "title": "Checking & Unboxing",
+          "description": "Isi paket dan kondisi produk diperiksa saat proses pembukaan."
+        },
+        {
+          "title": "Update Return Data",
+          "description": "Hasil pemeriksaan dicatat dan status return diperbarui."
+        },
+        {
+          "title": "Putaway",
+          "description": "Produk yang dapat disimpan kembali ditempatkan ke lokasi inventory."
+        }
+      ],
+      "image": "/anagata-images/inventory.jpg"
+    }
+  ],
+  "activity": [
+    {
+      "name": "People",
+      "tagline": "Manusia di balik setiap paket.",
+      "body": "Tim yang peduli membuat sistem terasa manusiawi. Setiap barang disentuh, diperiksa, dan dipersiapkan dengan perhatian.",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "Process",
+      "tagline": "Gerak cepat, tetap terukur.",
+      "body": "Alur kerja yang jelas membantu kami bergerak cepat tanpa kehilangan akurasi pada setiap tahap fulfillment.",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "Purpose",
+      "tagline": "Ruang untuk tumbuh lebih jauh.",
+      "body": "Semua yang kami kerjakan punya satu tujuan: memberi pemilik bisnis lebih banyak ruang untuk fokus pada langkah berikutnya.",
+      "image": "/anagata-images/inventory.jpg"
+    }
+  ],
+  "photo": [
+    {
+      "name": "PACK / 08:42",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "STOCK / DAILY",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "PEOPLE / ANAGATA",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "MOVE / FORWARD",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "DETAIL / MATTERS",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "COUNT / CHECK",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "FLOW / FORWARD",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "BETTER / TOGETHER",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "SPACE / GROW",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "HANDS / CARE",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "DAILY / MOTION",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "TEAM / ANAGATA",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "READY / TO GO",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "ORGANIZED / DAILY",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "PEOPLE / FIRST",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "OUTBOUND / MOTION",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "REAL TIME / STOCK",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "PACKED / WITH CARE",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "FORWARD / 10",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "GROW / 11",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    },
+    {
+      "name": "ONE BY ONE",
+      "image": "/anagata-images/packing.jpg"
+    },
+    {
+      "name": "SAFE / 12",
+      "image": "/anagata-images/inventory.jpg"
+    },
+    {
+      "name": "NEXT MOVE",
+      "image": "/anagata-images/operations.jpg"
+    },
+    {
+      "name": "FUTURE / NOW",
+      "image": "/anagata-images/warehouse-hero.jpg"
+    }
+  ],
+  "section": [
+    {
+      "name": "Sekapur Sirih",
+      "headline": "Untuk para pemilik mimpi di Indonesia.",
+      "body_1": "Untuk setiap pemilik bisnis yang memulai dengan sebuah ide dan terus menjaganya hingga menjadi pesanan pertama: kami tahu ada banyak hal yang kamu kerjakan di balik layar.",
+      "body_2": "Setiap produk membawa kerja kerasmu. Setiap paket juga membawa kepercayaan pelanggan. Karena itu, perhatian pada detail menjadi bagian dari cara kami mendampingi perjalanan bisnismu.",
+      "body_3": "Dari barang yang tiba sampai pesanan siap dikirim, kami membantu merapikan prosesnya agar kamu punya lebih banyak ruang untuk fokus pada pelanggan dan langkah berikutnya.",
+      "image": "/anagata-images/packing.jpg",
+      "youtube_id": "",
+      "credit": ""
+    },
+    {
+      "name": "Arti Anagata",
+      "headline": "Sebuah nama untuk sesuatu yang |akan datang.",
+      "body_1": "Anagata berarti masa depan—harapan baik untuk sesuatu yang akan datang. Bagi kami, harapan itu dimulai dari hal-hal yang kita kerjakan hari ini.",
+      "body_2": "Saat barang diterima, stok ditata, dan setiap pesanan dipersiapkan, ada perhatian pada detail yang membantu perjalanan sebuah brand terus berjalan.",
+      "body_3": "Kami hadir sebagai teman perjalanan seller, menjaga proses di belakang layar agar kamu dapat melangkah lebih yakin menuju rencana berikutnya.",
+      "image": "/anagata-images/inventory.jpg",
+      "youtube_id": "",
+      "credit": ""
+    },
+    {
+      "name": "Sejarah",
+      "headline": "Lahir dari komitmen menjadi |sahabat seller.",
+      "body_1": "Anagata Warehouse berdiri di bawah bendera CV Anagata Satria Nusantara sejak 2024, bergerak di lini fulfillment dan home packing. Nama “Anagata” berarti harapan yang baik, untuk seller, kurir, buyer, dan setiap orang yang terlibat di dalamnya.",
+      "body_2": "Kami hadir untuk mempermudah seller mengelola inventory, data, packing, hingga urusan shipping, supaya seller bisa fokus mengembangkan bisnisnya, bukan sibuk mengurus gudang.",
+      "body_3": "",
+      "image": "/anagata-images/warehouse-hero.jpg",
+      "youtube_id": "",
+      "credit": ""
+    },
+    {
+      "name": "Video cerita",
+      "headline": "Ada cerita di balik |setiap paket.",
+      "body_1": "Di balik setiap pesanan, ada orang-orang yang bekerja bersama: menerima barang, menata stok, dan menyiapkannya untuk perjalanan berikutnya.",
+      "body_2": "",
+      "body_3": "",
+      "image": "/anagata-images/operations.jpg",
+      "youtube_id": "TprgJuLRPFY",
+      "credit": "Video referensi: DFDS & Miele · YouTube"
+    },
+    {
+      "name": "Kontak",
+      "headline": "#Let'sGrowTogether",
+      "body_1": "Bisnismu punya cerita. Mari kita jaga perjalanan setiap pesanannya, bersama.",
+      "body_2": "",
+      "body_3": "",
+      "image": "/anagata-images/warehouse-hero.jpg",
+      "youtube_id": "",
+      "credit": ""
+    },
+    {
+      "name": "Opening",
+      "headline": "ANAGATA",
+      "body_1": "WAREHOUSE",
+      "body_2": "Jelajahi Anagata",
+      "body_3": "",
+      "image": "",
+      "youtube_id": "",
+      "credit": ""
+    }
+  ]
+}
